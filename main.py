@@ -2,51 +2,41 @@ import os
 import logging
 from dotenv import load_dotenv
 from fastapi import FastAPI
+
+# 🔥 CARGAR .env CORRECTAMENTE
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# ======================
-# ENV
-# ======================
-load_dotenv()
-
-# ======================
-# IMPORTS
-# ======================
 from database import Base, engine
 from routers import usuarios, viajes, ofertas, chat, evaluaciones
 
+import firebase_admin
+from firebase_admin import credentials
+
 # ======================
-# CONFIG
+# CONFIG INICIAL
 # ======================
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
 # ======================
-# FIREBASE (OPCIONAL)
+# FIREBASE
 # ======================
-try:
-    import firebase_admin
-    from firebase_admin import credentials
+firebase_path = os.getenv("FIREBASE_CREDENTIALS")
+firebase_url = os.getenv("FIREBASE_DB_URL")
 
-    firebase_path = os.getenv("FIREBASE_CREDENTIALS")
-    firebase_url = os.getenv("FIREBASE_DB_URL")
+if not firebase_path or not firebase_url:
+    raise Exception("Faltan variables FIREBASE en .env")
 
-    if firebase_path and firebase_url and os.path.exists(firebase_path):
-        cred = credentials.Certificate(firebase_path)
+cred = credentials.Certificate(firebase_path)
 
-        if not firebase_admin._apps:
-            firebase_admin.initialize_app(cred, {
-                "databaseURL": firebase_url
-            })
-
-        print("🔥 Firebase inicializado")
-
-    else:
-        print("⚠️ Firebase desactivado (no configurado)")
-
-except Exception as e:
-    print(f"❌ Firebase error: {e}")
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(cred, {
+        "databaseURL": firebase_url
+    })
 
 # ======================
 # DB
@@ -60,7 +50,7 @@ origins = os.getenv("CORS_ORIGINS", "*")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins.split(",") if origins != "*" else ["*"],
+    allow_origins=origins.split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

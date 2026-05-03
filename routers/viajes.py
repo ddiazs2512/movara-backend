@@ -819,9 +819,12 @@ def actualizar_ubicacion(
     # ======================
     # LOG INICIAL
     # ======================
+    
     print(f"[TRACK] REQUEST viaje={data.viaje_id} user={current_user.id}")
 
     viaje = db.query(Viaje).filter(Viaje.id == data.viaje_id).first()
+
+    print(f"[TRACK] estado={viaje.estado} conductor={viaje.conductor_id}")
 
     # ======================
     # VALIDACIONES ESTRICTAS
@@ -832,6 +835,12 @@ def actualizar_ubicacion(
 
     if viaje.conductor_id is None:
         raise HTTPException(409, "viaje_sin_conductor")
+
+    if viaje.estado == "finalizado":
+        return {"ok": True}
+    
+    if viaje.estado not in ["en_camino", "llegado", "en_curso"]:
+        raise HTTPException(409, f"tracking_no_permitido_estado_{viaje.estado}")
 
     if viaje.conductor_id != current_user.id:
         raise HTTPException(

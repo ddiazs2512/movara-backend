@@ -1,45 +1,30 @@
-import os
 import json
 import requests
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from sqlalchemy.orm import Session
 
-# 📍 Ruta al JSON (solo funcionará en local)
-SERVICE_ACCOUNT_FILE = "service_account.json"
 
-# 📍 ID de tu proyecto Firebase
+# 📍 Ruta al JSON
+import os
+SERVICE_ACCOUNT_FILE = os.getenv("FIREBASE_CREDENTIALS")
+
+# 📍 ID de tu proyecto Firebase (IMPORTANTE)
 PROJECT_ID = "movara-f0278"
 
-
 def get_access_token():
-    try:
-        # 🔴 SI NO EXISTE EL ARCHIVO → NO ROMPER
-        if not os.path.exists(SERVICE_ACCOUNT_FILE):
-            print("⚠️ Firebase desactivado: no hay service_account.json")
-            return None
+    credentials = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE,
+        scopes=["https://www.googleapis.com/auth/firebase.messaging"]
+    )
 
-        credentials = service_account.Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE,
-            scopes=["https://www.googleapis.com/auth/firebase.messaging"]
-        )
-
-        credentials.refresh(Request())
-        return credentials.token
-
-    except Exception as e:
-        print(f"❌ ERROR FIREBASE TOKEN: {e}")
-        return None
+    credentials.refresh(Request())
+    return credentials.token
 
 
 def enviar_notificacion_data(token: str, data: dict, db: Session = None):
 
     access_token = get_access_token()
-
-    # 🔴 SI NO HAY TOKEN → NO HACER NADA
-    if not access_token:
-        print("⚠️ Notificación omitida (Firebase no configurado)")
-        return
 
     url = f"https://fcm.googleapis.com/v1/projects/{PROJECT_ID}/messages:send"
 
@@ -59,7 +44,7 @@ def enviar_notificacion_data(token: str, data: dict, db: Session = None):
     }
 
     try:
-        response = requests.post(url, headers=headers, json=body)
+        response = requests.post(url, headers=headers, json=body, timeout=5)
 
     except Exception as e:
         print(f"❌ ERROR FCM REQUEST: {e}")
@@ -78,7 +63,8 @@ def enviar_notificacion_data(token: str, data: dict, db: Session = None):
             "unregistered"
         ]):
 
-            print(f"🗑️ Token inválido detectado: {token[:20]}")
+            import logging
+            logging.warning("Token inválido detectado")
 
             from database import SessionLocal
             from models import FCMToken
@@ -95,10 +81,10 @@ def enviar_notificacion_data(token: str, data: dict, db: Session = None):
                 ).delete()
                 db.commit()
 
-                print("✅ Token eliminado de la base de datos")
+                logging.info("Token eliminado de la base de datos")
 
             except Exception as e:
-                print(f"❌ Error eliminando token: {e}")
+                logging.error(f"Error eliminando token: {e}")
 
             finally:
                 if close_db:

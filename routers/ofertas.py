@@ -192,6 +192,9 @@ def responder_oferta(
         # 🔒 TODO EN UNA SOLA FUNCIÓN
         viaje = asignar_conductor_seguro(db, viaje.id, oferta.conductor_id)
 
+        if viaje.estado != "asignado":
+            raise HTTPException(400, "estado_invalido_post_asignacion")
+
         # 🔥 GUARDAR PRECIO
         viaje.precio_acordado = oferta.precio
 
@@ -228,6 +231,7 @@ def responder_oferta(
     # EN CAMINO
     # ======================
     elif data.accion == "en_camino":
+
 
         if current_user.rol != "conductor":
             raise HTTPException(403, "Solo conductores")

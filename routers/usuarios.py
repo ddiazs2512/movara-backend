@@ -71,7 +71,7 @@ def register(
     if existente:
         raise HTTPException(400, "Teléfono ya registrado")
 
-    hashed = bcrypt.hashpw(usuario.password.encode(), bcrypt.gensalt()).decode()
+    hashed = bcrypt.hashpw(usuario.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     nuevo = Usuario(
         telefono=usuario.telefono,
@@ -106,7 +106,10 @@ def login(usuario: UsuarioLogin, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(404, "Usuario no encontrado")
 
-    if not bcrypt.checkpw(usuario.password.encode(), user.hashed_password.encode()):
+    if not bcrypt.checkpw(
+        usuario.password.encode("utf-8"),
+        user.hashed_password.encode("utf-8")
+    ):
         raise HTTPException(400, "Contraseña incorrecta")
 
     access_token = create_access_token({

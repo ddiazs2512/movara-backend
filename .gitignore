@@ -1,19 +1,25 @@
+# Python
 __pycache__/
 *.pyc
+
+# Entorno
 .env
 venv/
+env/
+
+# Base de datos
+*.db
+movara.db
+
+# Firebase / credenciales
+secure/
+service_account.json
 firebase_key.json
 firebase.json
-service_account.json
-movara.db
-*.db
 
-# logs
+# Logs
 *.log
 
-# sistema
+# Sistema
 .DS_Store
 Thumbs.db
-
-# entorno virtual alternativo
-env/
