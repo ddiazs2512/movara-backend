@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Movara</title>
+</head>
+<body style="font-family: Arial; text-align:center; margin-top:60px;">
+
+<div id="loginBox">
+
+    <h1>Movara</h1>
+
+    <input id="telefono" placeholder="Teléfono"><br><br>
+    <input id="password" type="password" placeholder="Contraseña"><br><br>
+
+    <button onclick="login()">Iniciar sesión</button>
+
+    <p id="resultado"></p>
+
+</div>
+
+<div id="panelCliente" style="display:none;">
+    <h2>Panel Cliente</h2>
+
+    <input id="origen" placeholder="Origen"><br><br>
+    <input id="destino" placeholder="Destino"><br><br>
+    <input id="precio" placeholder="Precio"><br><br>
+
+    <button onclick="crearViaje()">Crear viaje</button>
+
+    <p id="viajeResultado"></p>
+
+    <hr>
+    <button onclick="logout()">Cerrar sesión</button>
+</div>
+
+<div id="panelConductor" style="display:none;">
+    <h2>Panel Conductor</h2>
+
+    <button onclick="verViajes()">Ver viajes pendientes</button>
+
+    <pre id="listaViajes"></pre>
+
+    <hr>
+    <button onclick="logout()">Cerrar sesión</button>
+</div>
+
+<script>
+
+let usuario_id = null;
+let rol_usuario = null;
+
+function login() {
+
+    const telefono = document.getElementById("telefono").value;
+    const password = document.getElementById("password").value;
+
+    fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            telefono: telefono,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.usuario_id) {
+
+            usuario_id = data.usuario_id;
+            rol_usuario = data.rol;
+
+            document.getElementById("loginBox").style.display = "none";
+
+            if (rol_usuario === "cliente") {
+                document.getElementById("panelCliente").style.display = "block";
+            } else if (rol_usuario === "conductor") {
+                document.getElementById("panelConductor").style.display = "block";
+            }
+
+        } else {
+            document.getElementById("resultado").innerText = data.detail;
+        }
+
+    });
+}
+
+function crearViaje() {
+
+    const origen = document.getElementById("origen").value;
+    const destino = document.getElementById("destino").value;
+    const precio = document.getElementById("precio").value;
+
+    fetch("http://localhost:8000/crear_viaje", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            cliente_id: usuario_id,
+            origen: origen,
+            destino: destino,
+            precio_propuesto: parseFloat(precio)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("viajeResultado").innerText = JSON.stringify(data);
+    });
+}
+
+function verViajes() {
+
+    fetch("http://localhost:8000/viajes_pendientes")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("listaViajes").innerText = JSON.stringify(data, null, 2);
+    });
+}
+
+function logout() {
+    usuario_id = null;
+    rol_usuario = null;
+
+    document.getElementById("panelCliente").style.display = "none";
+    document.getElementById("panelConductor").style.display = "none";
+    document.getElementById("loginBox").style.display = "block";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.env
+venv/
+firebase_key.json
+firebase.json
+service_account.json
+movara.db
+*.db
+
+# logs
+*.log
+
+# sistema
+.DS_Store
+Thumbs.db
+
+# entorno virtual alternativo
+env/
