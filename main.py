@@ -1,10 +1,6 @@
 import os
 import logging
-from dotenv import load_dotenv
 from fastapi import FastAPI
-
-# 🔥 CARGAR .env CORRECTAMENTE
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
