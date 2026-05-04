@@ -539,8 +539,37 @@ def viajes_disponibles(
 
     resultado = []
 
+    # 🔥 UBICACIÓN DEL CONDUCTOR
+    ubicacion_conductor = db.query(Ubicacion).filter(
+        Ubicacion.conductor_id == current_user.id
+    ).order_by(Ubicacion.id.desc()).first()
+
+    # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
+    if not ubicacion_conductor:
+        return []
+
+    # 🔥 RADIO MÁXIMO
+    MAX_DIST = 600  # metros
+
     for v in viajes:
 
+        # ======================
+        # 📏 DISTANCIA
+        # ======================
+        distancia = calcular_distancia_metros(
+            ubicacion_conductor.lat,
+            ubicacion_conductor.lng,
+            v.lat_origen,
+            v.lng_origen
+        )
+
+        # 🔥 FILTRO REAL (CLAVE)
+        if distancia > MAX_DIST:
+            continue
+
+        # ======================
+        # 🗺️ RUTA (OPCIONAL)
+        # ======================
         ruta = obtener_ruta_google(
             v.lat_origen,
             v.lng_origen,
@@ -563,7 +592,9 @@ def viajes_disponibles(
             "lat_destino": v.lat_destino,
             "lng_destino": v.lng_destino,
             "ultimo_en_ofertar": None,
-            "distancia_conductor_m": None,
+
+            # 🔥 AHORA SÍ REAL
+            "distancia_conductor_m": distancia,
 
             "ruta": {
                 "distancia_texto": ruta["distancia_texto"] if ruta else None,
