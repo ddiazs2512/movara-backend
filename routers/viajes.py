@@ -358,7 +358,8 @@ def crear_viaje(
             candidatos.append(c)
 
     if not candidatos:
-        candidatos = conductores
+        print("⚠️ No hay conductores cercanos, no se envía notificación")
+        candidatos = []
 
     # ======================
     # NOTIFICACIONES
@@ -685,37 +686,56 @@ def viajes_pendientes(
     # 📦 TRAER VIAJES DISPONIBLES
     # ======================
     viajes = db.query(Viaje).filter(
-        Viaje.estado.in_(["oferta"]),
+        Viaje.estado == "oferta",
         Viaje.conductor_id == None
     ).order_by(Viaje.id.desc()).all()
 
     resultado = []
 
-    # 🔥 obtener ubicación del conductor
+    # 🔥 UBICACIÓN DEL CONDUCTOR
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id
     ).order_by(Ubicacion.id.desc()).first()
 
+    # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
+    if not ubicacion_conductor:
+        return []
+
+    # 🔥 RADIO MÁXIMO
+    MAX_DIST = 600  # metros
+
     for v in viajes:
 
-        cliente = db.query(Usuario).filter(Usuario.id == v.cliente_id).first()
-        distancia_conductor = None
+        cliente = db.query(Usuario).filter(
+            Usuario.id == v.cliente_id
+        ).first()
 
-        if ubicacion_conductor:
-            distancia_conductor = calcular_distancia_metros(
-                ubicacion_conductor.lat,
-                ubicacion_conductor.lng,
-                v.lat_origen,
-                v.lng_origen
-            )
+        # ======================
+        # 📏 CALCULAR DISTANCIA
+        # ======================
+        distancia_conductor = calcular_distancia_metros(
+            ubicacion_conductor.lat,
+            ubicacion_conductor.lng,
+            v.lat_origen,
+            v.lng_origen
+        )
 
-        # 🔥 TRAER DATA DE FIREBASE
+        # 🔥 FILTRO REAL (CLAVE)
+        if distancia_conductor > MAX_DIST:
+            continue
+
+        # ======================
+        # 🔥 FIREBASE DATA
+        # ======================
         ref = firebase_db.reference(f"viajes_activos/{v.id}")
         try:
             data_fb = ref.get() or {}
         except:
             data_fb = {}
 
+        # ======================
+        # 📦 RESPUESTA
+        # ======================
         resultado.append({
             "id": v.id,
             "estado": v.estado,
@@ -731,10 +751,8 @@ def viajes_pendientes(
             "precio_cliente": v.precio_cliente_1,
             "cliente_nombre": cliente.nombre if cliente else "Cliente",
 
-            # 🔥 YA LO TENÍAS
             "distancia_conductor_m": distancia_conductor,
 
-            # 🔥 ESTE ES EL FIX REAL
             "ruta": data_fb.get("ruta") if data_fb else None
         })
 
