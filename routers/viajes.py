@@ -327,11 +327,8 @@ def crear_viaje(
     ).all()
 
     if not conductores:
-        conductores = db.query(Usuario).filter(
-            Usuario.rol == "conductor",
-            Usuario.modo_actual == "conductor",
-            Usuario.activo == True
-        ).all()
+        print(f"⚠️ No hay conductores en ciudad: {ciudad}")
+        conductores = []
 
     # ======================
     # FILTRO POR DISTANCIA
@@ -620,6 +617,7 @@ def viaje_activo(
             (Viaje.conductor_id == current_user.id)
         ),
         Viaje.estado.in_([
+            "oferta",
             "asignado",
             "en_camino",
             "llegado",
@@ -1117,5 +1115,7 @@ def cancelar_viaje(
         )
 
     actualizar_estado_viaje(db, viaje, "cancelado")
+
+    firebase_db.reference(f"viajes_activos/{viaje.id}").delete()
 
     return {"mensaje": "Viaje cancelado"}
