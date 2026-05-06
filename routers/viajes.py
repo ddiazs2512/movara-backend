@@ -549,7 +549,7 @@ def viajes_disponibles(
         return []
 
     # 🔥 RADIO MÁXIMO
-    MAX_DIST = 600  # metros
+    MAX_DIST = 2000  # metros
 
     for v in viajes:
 
