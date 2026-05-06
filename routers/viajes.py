@@ -322,8 +322,7 @@ def crear_viaje(
     conductores = db.query(Usuario).filter(
         Usuario.rol == "conductor",
         Usuario.modo_actual == "conductor",
-        Usuario.activo == True,
-        Usuario.ciudad == ciudad
+        Usuario.activo == True
     ).all()
 
     if not conductores:
