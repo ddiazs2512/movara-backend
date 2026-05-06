@@ -184,6 +184,10 @@ class CambiarEstadoRequest(BaseModel):
     viaje_id: int
     estado: str
 
+class UbicacionConductorRequest(BaseModel):
+    lat: float
+    lng: float
+
 # ======================
 # ALMACENAMIENTO TEMPORAL
 # ======================
@@ -350,7 +354,7 @@ def crear_viaje(
             ubicacion.lng
         )
 
-        if distancia <= 1600:
+        if distancia <= 600:
             candidatos.append(c)
 
     if not candidatos:
@@ -1118,3 +1122,34 @@ def cancelar_viaje(
     firebase_db.reference(f"viajes_activos/{viaje.id}").delete()
 
     return {"mensaje": "Viaje cancelado"}
+
+@router.post("/actualizar_ubicacion_disponible")
+def actualizar_ubicacion_disponible(
+    data: UbicacionConductorRequest,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+
+    if current_user.rol != "conductor":
+        raise HTTPException(403, "Solo conductores")
+
+    ubicacion = db.query(Ubicacion).filter(
+        Ubicacion.conductor_id == current_user.id,
+        Ubicacion.viaje_id == None
+    ).first()
+
+    if ubicacion:
+        ubicacion.lat = data.lat
+        ubicacion.lng = data.lng
+    else:
+        ubicacion = Ubicacion(
+            conductor_id=current_user.id,
+            viaje_id=None,
+            lat=data.lat,
+            lng=data.lng
+        )
+        db.add(ubicacion)
+
+    db.commit()
+
+    return {"ok": True}
