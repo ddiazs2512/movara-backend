@@ -351,7 +351,7 @@ def crear_viaje(
             ubicacion.lng
         )
 
-        if distancia <= 600:
+        if distancia <= 1600:
             candidatos.append(c)
 
     if not candidatos:
