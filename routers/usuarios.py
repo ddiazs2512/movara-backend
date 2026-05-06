@@ -71,7 +71,7 @@ def register(
     if existente:
         raise HTTPException(400, "Teléfono ya registrado")
 
-    hashed = bcrypt.hashpw(usuario.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    hashed = bcrypt.hashpw(usuario.password.encode("utf-8"), bcrypt.gensalt(rounds=10)).decode("utf-8")
 
     nuevo = Usuario(
         telefono=usuario.telefono,
