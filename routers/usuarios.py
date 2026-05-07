@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 import bcrypt
 from fastapi.security import OAuth2PasswordBearer
+import random
 
 from auth import verify_token, create_access_token
 from models import Usuario, Conductor, FCMToken
@@ -186,8 +187,17 @@ def convertir_conductor(
 # RECUPERAR PASSWORD
 # ======================
 
+otp_storage = {}
+
 @router.post("/recuperar_password")
 def recuperar_password(telefono: str):
+
+    codigo = str(random.randint(100000, 999999))
+
+    otp_storage[telefono] = codigo
+
+    print(f"🔐 OTP {telefono}: {codigo}")
+
     return {"mensaje": "Código enviado"}
 
 # ======================
@@ -196,6 +206,15 @@ def recuperar_password(telefono: str):
 
 @router.post("/verificar_codigo")
 def verificar_codigo(telefono: str, codigo: str):
+
+    guardado = otp_storage.get(telefono)
+
+    if not guardado:
+        raise HTTPException(404, "Código no encontrado")
+
+    if guardado != codigo:
+        raise HTTPException(400, "Código incorrecto")
+
     return {"mensaje": "Código verificado"}
 
 # ======================
