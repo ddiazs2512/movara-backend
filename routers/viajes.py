@@ -354,7 +354,7 @@ def crear_viaje(
             ubicacion.lng
         )
 
-        if distancia <= 600:
+        if distancia <= 4000:
             candidatos.append(c)
 
     if not candidatos:
@@ -549,7 +549,7 @@ def viajes_disponibles(
         return []
 
     # 🔥 RADIO MÁXIMO
-    MAX_DIST = 2000  # metros
+    MAX_DIST = 4000  # metros
 
     for v in viajes:
 
@@ -734,7 +734,7 @@ def viajes_pendientes(
         return []
 
     # 🔥 RADIO MÁXIMO
-    MAX_DIST = 2000  # metros
+    MAX_DIST = 4000  # metros
 
     for v in viajes:
 
