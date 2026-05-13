@@ -636,27 +636,27 @@ def viaje_activo(
 
     if viaje and viaje.estado == "oferta":
 
-    tiempo_pasado = datetime.utcnow() - viaje.fecha_creacion
+        tiempo_pasado = datetime.utcnow() - viaje.fecha_creacion
 
-    if tiempo_pasado > timedelta(minutes=15):
+        if tiempo_pasado > timedelta(minutes=15):
 
-        print(f"⏰ VIAJE EXPIRADO {viaje.id}")
+            print(f"⏰ VIAJE EXPIRADO {viaje.id}")
 
-        actualizar_estado_viaje(
-            db,
-            viaje,
-            "cancelado"
-        )
+            actualizar_estado_viaje(
+                db,
+                viaje,
+                "cancelado"
+            )
 
-        try:
-            firebase_db.reference(
-                f"viajes_activos/{viaje.id}"
-            ).delete()
+            try:
+                firebase_db.reference(
+                    f"viajes_activos/{viaje.id}"
+                ).delete()
 
-        except Exception as e:
-            print("❌ ERROR ELIMINANDO FIREBASE:", e)
+            except Exception as e:
+                print("❌ ERROR ELIMINANDO FIREBASE:", e)
 
-        viaje = None
+            viaje = None
 
     # ❌ NO HAY VIAJE ACTIVO
     if not viaje:
