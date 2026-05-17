@@ -341,7 +341,8 @@ def crear_viaje(
     for c in conductores:
 
         ubicacion = db.query(Ubicacion).filter(
-            Ubicacion.conductor_id == c.id
+            Ubicacion.conductor_id == c.id,
+            Ubicacion.viaje_id == None
         ).order_by(Ubicacion.id.desc()).first()
 
         if not ubicacion:
@@ -541,7 +542,8 @@ def viajes_disponibles(
 
     # 🔥 UBICACIÓN DEL CONDUCTOR
     ubicacion_conductor = db.query(Ubicacion).filter(
-        Ubicacion.conductor_id == current_user.id
+        Ubicacion.conductor_id == current_user.id,
+        Ubicacion.viaje_id == None
     ).order_by(Ubicacion.id.desc()).first()
 
     # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
@@ -756,7 +758,8 @@ def viajes_pendientes(
 
     # 🔥 UBICACIÓN DEL CONDUCTOR
     ubicacion_conductor = db.query(Ubicacion).filter(
-        Ubicacion.conductor_id == current_user.id
+        Ubicacion.conductor_id == current_user.id,
+        Ubicacion.viaje_id == None
     ).order_by(Ubicacion.id.desc()).first()
 
     # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
