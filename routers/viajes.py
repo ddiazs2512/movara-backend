@@ -256,12 +256,17 @@ def crear_viaje(
     # ======================
     activos = db.query(Viaje.id).filter(
         Viaje.cliente_id == cliente_id,
-        Viaje.estado.in_(["oferta","asignado","en_camino","llegado","en_curso"])
+        Viaje.estado.in_([
+            "oferta",
+            "asignado",
+            "en_camino",
+            "llegado",
+            "en_curso"
+        ])
     ).all()
 
     if len(activos) > 0:
         raise HTTPException(400, "Ya tienes un viaje activo")
-        
 
     # ======================
     # CREAR VIAJE
@@ -296,7 +301,9 @@ def crear_viaje(
         nuevo.lng_destino
     )
 
-    cliente = db.query(Usuario).filter(Usuario.id == nuevo.cliente_id).first()
+    cliente = db.query(Usuario).filter(
+        Usuario.id == nuevo.cliente_id
+    ).first()
 
     firebase_db.reference(f"viajes_activos/{nuevo.id}").set({
         "estado": "oferta",
@@ -330,7 +337,7 @@ def crear_viaje(
     ).all()
 
     if not conductores:
-        print(f"⚠️ No hay conductores en ciudad: {ciudad}")
+        print(f"⚠️ No hay conductores activos en ciudad: {ciudad}")
         conductores = []
 
     # ======================
@@ -340,13 +347,21 @@ def crear_viaje(
 
     for c in conductores:
 
+        print(f"🧪 Evaluando conductor {c.id}")
+
         ubicacion = db.query(Ubicacion).filter(
             Ubicacion.conductor_id == c.id,
             Ubicacion.viaje_id == None
         ).order_by(Ubicacion.id.desc()).first()
 
         if not ubicacion:
+            print(f"❌ Conductor {c.id} SIN ubicación disponible")
             continue
+
+        print(
+            f"📍 Conductor {c.id}: "
+            f"{ubicacion.lat}, {ubicacion.lng}"
+        )
 
         distancia = calcular_distancia_metros(
             nuevo.lat_origen,
@@ -355,24 +370,53 @@ def crear_viaje(
             ubicacion.lng
         )
 
+        print(
+            f"📏 Distancia conductor {c.id}: "
+            f"{distancia} metros"
+        )
+
         if distancia <= 4000:
+
+            print(f"✅ Conductor {c.id} agregado")
+
             candidatos.append(c)
 
+        else:
+
+            print(f"🚫 Conductor {c.id} fuera de rango")
+
+    # ======================
+    # SIN CANDIDATOS
+    # ======================
     if not candidatos:
+
         print("⚠️ No hay conductores cercanos, no se envía notificación")
-        candidatos = []
+
+        return {
+            "mensaje": "No hay conductores cercanos",
+            "viaje_id": nuevo.id
+        }
 
     # ======================
     # NOTIFICACIONES
     # ======================
     for usuario in candidatos:
 
+        print(f"📲 Enviando notificación a conductor {usuario.id}")
+
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == usuario.id,
             Usuario.activo == True
         ).all()
 
+        if not tokens:
+            print(f"❌ Conductor {usuario.id} SIN token FCM")
+            continue
+
         for t in tokens:
+
+            print(f"📨 Token encontrado para conductor {usuario.id}")
+
             enviar_notificacion_data(
                 token=t.token,
                 data={
