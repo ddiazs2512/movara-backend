@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Float
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Float, func
 from datetime import datetime
 from database import Base
 from sqlalchemy.orm import relationship
@@ -203,10 +203,21 @@ class FCMToken(Base):
     token = Column(String, index=True)  # 🔥 quitamos unique=True para permitir múltiples dispositivos
 
 class Ubicacion(Base):
+
     __tablename__ = "ubicaciones"
 
-    id = Column(Integer, primary_key=True)
-    viaje_id = Column(Integer)
+    id = Column(Integer, primary_key=True, index=True)
+
     conductor_id = Column(Integer)
+
     lat = Column(Float)
+
     lng = Column(Float)
+
+    viaje_id = Column(Integer, nullable=True)
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )
