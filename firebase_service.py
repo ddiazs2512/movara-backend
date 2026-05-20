@@ -46,6 +46,12 @@ def enviar_notificacion_data(token: str, data: dict, db: Session = None):
     try:
         response = requests.post(url, headers=headers, json=body, timeout=5)
 
+        print("========== FCM ==========")
+        print("STATUS:", response.status_code)
+        print("BODY:", response.text)
+        print("DATA:", data)
+        print("=========================")
+
     except Exception as e:
         print(f"❌ ERROR FCM REQUEST: {e}")
         return
