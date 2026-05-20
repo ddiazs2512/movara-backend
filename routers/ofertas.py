@@ -211,9 +211,8 @@ def responder_oferta(
         db.commit()
         db.refresh(viaje)
 
-        tokens = db.query(FCMToken).join(Usuario).filter(
-            FCMToken.usuario_id == viaje.cliente_id,
-            Usuario.activo == True
+        tokens = db.query(FCMToken).filter(
+            FCMToken.usuario_id == oferta.conductor_id
         ).all()
 
         for t in tokens:
