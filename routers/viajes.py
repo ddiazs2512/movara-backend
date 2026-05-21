@@ -1180,10 +1180,10 @@ def detectar_ciudad(db, lat, lng):
     for c in ciudades:
 
         distancia = calcular_distancia_metros(
-            lat,
-            lng,
-            c["lat"],
-            c["lng"]
+            float(lat),
+            float(lng),
+            float(c["lat"]),
+            float(c["lng"])
         ) / 1000
 
         if distancia <= c["radio_km"]:
