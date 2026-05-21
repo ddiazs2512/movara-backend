@@ -364,13 +364,6 @@ def crear_viaje(
             ubicacion.lat,
             ubicacion.lng
         )
-        print(
-            "CONDUCTOR",
-            c.id,
-            c.nombre,
-            "DISTANCIA:",
-            distancia
-        )
 
         print("==============")
         print("CLIENTE:", data.lat_origen, data.lng_origen)
