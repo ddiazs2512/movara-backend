@@ -1208,6 +1208,8 @@ def actualizar_ubicacion_disponible(
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
         Ubicacion.viaje_id == None
+    ).order_by(
+        Ubicacion.updated_at.desc()
     ).first()
 
     if ubicacion:
