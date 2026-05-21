@@ -52,6 +52,7 @@ class Usuario(Base):
     ciudad = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     rol = Column(String, nullable=False)  # cliente / conductor
+    ciudad_id = Column(Integer)
 
     # Estados
     activo = Column(Boolean, default=False)
@@ -119,6 +120,7 @@ class Viaje(Base):
     comision_app = Column(Float, nullable=True)
     ganancia_conductor = Column(Float, nullable=True)
     ciudad = Column(String, nullable=True)
+    ciudad_id = Column(Integer)
 
     estado = Column(String, default=EstadoViaje.OFERTA.value, index=True)
 
@@ -207,15 +209,11 @@ class Ubicacion(Base):
     __tablename__ = "ubicaciones"
 
     id = Column(Integer, primary_key=True, index=True)
-
     conductor_id = Column(Integer)
-
+    ciudad_id = Column(Integer)
     lat = Column(Float)
-
     lng = Column(Float)
-
     viaje_id = Column(Integer, nullable=True)
-
     updated_at = Column(
         DateTime(timezone=True),
         server_default=func.now(),
