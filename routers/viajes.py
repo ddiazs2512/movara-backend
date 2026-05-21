@@ -364,6 +364,19 @@ def crear_viaje(
             ubicacion.lat,
             ubicacion.lng
         )
+        print(
+            "CONDUCTOR",
+            c.id,
+            c.nombre,
+            "DISTANCIA:",
+            distancia
+        )
+
+        print("==============")
+        print("CLIENTE:", data.lat_origen, data.lng_origen)
+        print("CONDUCTOR:", ubicacion.lat, ubicacion.lng)
+        print("DISTANCIA:", distancia)
+        print("==============")
 
         if distancia <= 4000:
             candidatos.append(c)
