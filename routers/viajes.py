@@ -324,11 +324,20 @@ def crear_viaje(
     # ======================
     # CONDUCTORES DISPONIBLES
     # ======================
-    conductores = db.query(Usuario).filter(
+    from datetime import timedelta
+
+    limite = datetime.utcnow() - timedelta(seconds=20)
+
+    conductores = db.query(Usuario).join(
+        Ubicacion,
+        Ubicacion.conductor_id == Usuario.id
+    ).filter(
         Usuario.rol == "conductor",
         Usuario.modo_actual == "conductor",
-        Usuario.activo == True
-    ).all()
+        Usuario.activo == True,
+        Ubicacion.viaje_id == None,
+        Ubicacion.updated_at >= limite
+    ).distinct(Usuario.id).all()
 
     if not conductores:
         print(f"⚠️ No hay conductores en ciudad: {ciudad}")
@@ -344,7 +353,7 @@ def crear_viaje(
         ubicacion = db.query(Ubicacion).filter(
             Ubicacion.conductor_id == c.id,
             Ubicacion.viaje_id == None
-        ).order_by(Ubicacion.id.desc()).first()
+        ).order_by(Ubicacion.updated_at.desc()).first()
 
         if not ubicacion:
             continue
@@ -421,9 +430,16 @@ def get_viaje(
     ).first()
 
     # 📍 ubicación REAL (tabla Ubicacion)
+    from datetime import timedelta
+
+    limite = datetime.utcnow() - timedelta(seconds=20)
+
     ubicacion = db.query(Ubicacion).filter(
-        Ubicacion.viaje_id == viaje.id
-    ).order_by(Ubicacion.id.desc()).first()
+        Ubicacion.viaje_id == viaje.id,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
+    ).first()
 
     return {
         "id": viaje.id,
@@ -471,7 +487,7 @@ def mis_viajes(
 
     viajes = db.query(Viaje).filter(
         Viaje.cliente_id == current_user.id,
-        Viaje.estado.notin_(["finalizado", "cancelado", "cancelado"])
+        Viaje.estado.notin_(["finalizado", "cancelado"])
     ).order_by(Viaje.id.desc()).all()
 
     resultado = []
@@ -542,10 +558,17 @@ def viajes_disponibles(
     resultado = []
 
     # 🔥 UBICACIÓN DEL CONDUCTOR
+    from datetime import timedelta
+
+    limite = datetime.utcnow() - timedelta(seconds=20)
+
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
-        Ubicacion.viaje_id == None
-    ).order_by(Ubicacion.id.desc()).first()
+        Ubicacion.viaje_id == None,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
+    ).first()
 
     # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
     if not ubicacion_conductor:
@@ -757,11 +780,17 @@ def viajes_pendientes(
 
     resultado = []
 
+    from datetime import timedelta
+    limite = datetime.utcnow() - timedelta(seconds=20)
+
     # 🔥 UBICACIÓN DEL CONDUCTOR
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
-        Ubicacion.viaje_id == None
-    ).order_by(Ubicacion.id.desc()).first()
+        Ubicacion.viaje_id == None,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
+    ).first()
 
     # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
     if not ubicacion_conductor:
@@ -921,10 +950,7 @@ def actualizar_ubicacion(
         raise HTTPException(409, "viaje_sin_conductor")
 
     if viaje.estado == "finalizado":
-        return {"ok": True}
-    
-    if viaje.estado not in ["en_camino", "llegado", "en_curso"]:
-        raise HTTPException(409, f"tracking_no_permitido_estado_{viaje.estado}")
+        raise HTTPException(409, "viaje_finalizado")
 
     if viaje.conductor_id != current_user.id:
         raise HTTPException(
@@ -943,18 +969,26 @@ def actualizar_ubicacion(
 
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.viaje_id == data.viaje_id
+    ).order_by(
+        Ubicacion.updated_at.desc()
     ).first()
 
     if ubicacion:
+
         ubicacion.lat = data.lat
         ubicacion.lng = data.lng
+        ubicacion.updated_at = datetime.utcnow()
+
     else:
+
         nueva = Ubicacion(
             viaje_id=data.viaje_id,
             conductor_id=current_user.id,
             lat=data.lat,
-            lng=data.lng
+            lng=data.lng,
+            updated_at=datetime.utcnow()
         )
+
         db.add(nueva)
 
     # ======================
@@ -1009,8 +1043,15 @@ def obtener_ubicacion(
     current_user: Usuario = Depends(get_current_user)
 ):
 
+    from datetime import timedelta
+
+    limite = datetime.utcnow() - timedelta(seconds=20)
+
     ubicacion = db.query(Ubicacion).filter(
-        Ubicacion.viaje_id == viaje_id
+        Ubicacion.viaje_id == viaje_id,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
     ).first()
 
     if not ubicacion:
@@ -1046,30 +1087,6 @@ def historial_conductor(
         Viaje.estado == "finalizado"
     ).all()
 
-# ======================
-# ENDPOINTS ALTERNATIVOS (compatibilidad)
-# ======================
-
-@router.post("/actualizar_ubicacion_conductor")
-def actualizar_ubicacion_conductor(
-    viaje_id: int, 
-    lat: float, 
-    lng: float, 
-    db: Session = Depends(get_db),
-    current_user: Usuario = Depends(get_current_user)
-):
-    viaje = db.query(Viaje).filter(Viaje.id == viaje_id).first()
-    if not viaje:
-        raise HTTPException(404, "Viaje no encontrado")
-    if viaje.conductor_id != current_user.id:
-        raise HTTPException(403, "No eres el conductor de este viaje")
-    
-    # tu código actual de update aquí...
-    viaje.lat_conductor = lat
-    viaje.lng_conductor = lng
-    db.commit()
-    return {"ok": True}
-
 @router.get("/ubicacion_conductor/{viaje_id}")
 def obtener_ubicacion_conductor(
     viaje_id: int,
@@ -1077,8 +1094,14 @@ def obtener_ubicacion_conductor(
     current_user: Usuario = Depends(get_current_user)
 ):
 
+    from datetime import timedelta
+    limite = datetime.utcnow() - timedelta(seconds=20)
+
     ubicacion = db.query(Ubicacion).filter(
-        Ubicacion.viaje_id == viaje_id
+        Ubicacion.viaje_id == viaje_id,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
     ).first()
 
     if not ubicacion:
@@ -1096,7 +1119,7 @@ def get_mis_viajes_cliente(
 ):
     viajes = db.query(Viaje).filter(
         Viaje.cliente_id == current_user.id,
-        Viaje.estado.notin_(["finalizado", "cancelado", "cancelado"])
+        Viaje.estado.notin_(["finalizado", "cancelado"])
     ).all()
 
     return [
