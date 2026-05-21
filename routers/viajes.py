@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -256,17 +257,12 @@ def crear_viaje(
     # ======================
     activos = db.query(Viaje.id).filter(
         Viaje.cliente_id == cliente_id,
-        Viaje.estado.in_([
-            "oferta",
-            "asignado",
-            "en_camino",
-            "llegado",
-            "en_curso"
-        ])
+        Viaje.estado.in_(["oferta","asignado","en_camino","llegado","en_curso"])
     ).all()
 
     if len(activos) > 0:
         raise HTTPException(400, "Ya tienes un viaje activo")
+        
 
     # ======================
     # CREAR VIAJE
@@ -301,9 +297,7 @@ def crear_viaje(
         nuevo.lng_destino
     )
 
-    cliente = db.query(Usuario).filter(
-        Usuario.id == nuevo.cliente_id
-    ).first()
+    cliente = db.query(Usuario).filter(Usuario.id == nuevo.cliente_id).first()
 
     firebase_db.reference(f"viajes_activos/{nuevo.id}").set({
         "estado": "oferta",
@@ -337,7 +331,7 @@ def crear_viaje(
     ).all()
 
     if not conductores:
-        print(f"⚠️ No hay conductores activos en ciudad: {ciudad}")
+        print(f"⚠️ No hay conductores en ciudad: {ciudad}")
         conductores = []
 
     # ======================
@@ -347,21 +341,13 @@ def crear_viaje(
 
     for c in conductores:
 
-        print(f"🧪 Evaluando conductor {c.id}")
-
         ubicacion = db.query(Ubicacion).filter(
             Ubicacion.conductor_id == c.id,
             Ubicacion.viaje_id == None
         ).order_by(Ubicacion.id.desc()).first()
 
         if not ubicacion:
-            print(f"❌ Conductor {c.id} SIN ubicación disponible")
             continue
-
-        print(
-            f"📍 Conductor {c.id}: "
-            f"{ubicacion.lat}, {ubicacion.lng}"
-        )
 
         distancia = calcular_distancia_metros(
             nuevo.lat_origen,
@@ -370,53 +356,24 @@ def crear_viaje(
             ubicacion.lng
         )
 
-        print(
-            f"📏 Distancia conductor {c.id}: "
-            f"{distancia} metros"
-        )
-
         if distancia <= 4000:
-
-            print(f"✅ Conductor {c.id} agregado")
-
             candidatos.append(c)
 
-        else:
-
-            print(f"🚫 Conductor {c.id} fuera de rango")
-
-    # ======================
-    # SIN CANDIDATOS
-    # ======================
     if not candidatos:
-
         print("⚠️ No hay conductores cercanos, no se envía notificación")
-
-        return {
-            "mensaje": "No hay conductores cercanos",
-            "viaje_id": nuevo.id
-        }
+        candidatos = []
 
     # ======================
     # NOTIFICACIONES
     # ======================
     for usuario in candidatos:
 
-        print(f"📲 Enviando notificación a conductor {usuario.id}")
-
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == usuario.id,
             Usuario.activo == True
         ).all()
 
-        if not tokens:
-            print(f"❌ Conductor {usuario.id} SIN token FCM")
-            continue
-
         for t in tokens:
-
-            print(f"📨 Token encontrado para conductor {usuario.id}")
-
             enviar_notificacion_data(
                 token=t.token,
                 data={
@@ -1200,6 +1157,44 @@ def cancelar_viaje(
 
     return {"mensaje": "Viaje cancelado"}
 
+def detectar_ciudad(db, lat, lng):
+
+    ciudades = db.execute(text("""
+
+        SELECT
+            id,
+            nombre,
+            lat,
+            lng,
+            radio_km
+
+        FROM ciudades
+
+        WHERE activa = true
+
+    """)).mappings().all()
+
+    ciudad_detectada = None
+    menor_distancia = 999999999
+
+    for c in ciudades:
+
+        distancia = calcular_distancia_metros(
+            lat,
+            lng,
+            c["lat"],
+            c["lng"]
+        ) / 1000
+
+        if distancia <= c["radio_km"]:
+
+            if distancia < menor_distancia:
+
+                menor_distancia = distancia
+                ciudad_detectada = c
+
+    return ciudad_detectada
+
 @router.post("/actualizar_ubicacion_disponible")
 def actualizar_ubicacion_disponible(
     data: UbicacionConductorRequest,
@@ -1216,16 +1211,40 @@ def actualizar_ubicacion_disponible(
     ).first()
 
     if ubicacion:
+
         ubicacion.lat = data.lat
         ubicacion.lng = data.lng
+        ubicacion.updated_at = datetime.utcnow()
+
     else:
+
         ubicacion = Ubicacion(
             conductor_id=current_user.id,
             viaje_id=None,
             lat=data.lat,
-            lng=data.lng
+            lng=data.lng,
+            updated_at=datetime.utcnow()
         )
+
         db.add(ubicacion)
+
+    # ======================
+    # DETECTAR CIUDAD
+    # ======================
+
+    ciudad = detectar_ciudad(
+        db,
+        data.lat,
+        data.lng
+    )
+
+    if ciudad:
+
+        current_user.ciudad_id = ciudad["id"]
+
+        current_user.ciudad = ciudad["nombre"]
+
+        ubicacion.ciudad_id = ciudad["id"]
 
     db.commit()
 
