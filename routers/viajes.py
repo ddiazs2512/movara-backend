@@ -371,8 +371,7 @@ def crear_viaje(
         print("DISTANCIA:", distancia)
         print("==============")
 
-        if distancia <= 4000:
-            candidatos.append(c)
+        candidatos.append(c)
 
     if not candidatos:
         print("⚠️ No hay conductores cercanos, no se envía notificación")
