@@ -326,7 +326,7 @@ def crear_viaje(
     # ======================
     from datetime import timedelta
 
-    limite = datetime.utcnow() - timedelta(seconds=20)
+    limite = datetime.utcnow() - timedelta(minutes=5)
 
     conductores = db.query(Usuario).join(
         Ubicacion,
@@ -358,7 +358,15 @@ def crear_viaje(
         if not ubicacion:
             continue
     
-        candidatos.append(c)
+        distancia = calcular_distancia_metros(
+            nuevo.lat_origen,
+            nuevo.lng_origen,
+            ubicacion.lat,
+            ubicacion.lng
+        )
+        
+        if distancia <= 8000:
+            candidatos.append(c)
 
     # ======================
     # NOTIFICACIONES
@@ -420,7 +428,7 @@ def get_viaje(
     # 📍 ubicación REAL (tabla Ubicacion)
     from datetime import timedelta
 
-    limite = datetime.utcnow() - timedelta(seconds=20)
+    limite = datetime.utcnow() - timedelta(minutes=5)
 
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.viaje_id == viaje.id,
@@ -547,7 +555,7 @@ def viajes_disponibles(
 
     from datetime import timedelta
 
-    limite = datetime.utcnow() - timedelta(seconds=20)
+    limite = datetime.utcnow() - timedelta(minutes=5)
     
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
@@ -562,8 +570,12 @@ def viajes_disponibles(
 
     for v in viajes:
 
-        # 🔥 TEMPORAL
-        distancia = 0
+        distancia = calcular_distancia_metros(
+            ubicacion_conductor.lat,
+            ubicacion_conductor.lng,
+            v.lat_origen,
+            v.lng_origen
+        )
 
         ruta = obtener_ruta_google(
             v.lat_origen,
@@ -571,6 +583,9 @@ def viajes_disponibles(
             v.lat_destino,
             v.lng_destino
         )
+
+        if distancia > 8000:
+            continue
 
         resultado.append({
             "id": v.id,
@@ -740,7 +755,7 @@ def viajes_pendientes(
     resultado = []
 
     from datetime import timedelta
-    limite = datetime.utcnow() - timedelta(seconds=20)
+    limite = datetime.utcnow() - timedelta(minutes=5)
 
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
@@ -759,8 +774,15 @@ def viajes_pendientes(
             Usuario.id == v.cliente_id
         ).first()
 
-        # 🔥 TEMPORAL
-        distancia_conductor = 0
+        distancia_conductor = calcular_distancia_metros(
+            ubicacion_conductor.lat,
+            ubicacion_conductor.lng,
+            v.lat_origen,
+            v.lng_origen
+        )
+        
+        if distancia_conductor > 8000:
+            continue
 
         ref = firebase_db.reference(f"viajes_activos/{v.id}")
 
@@ -984,7 +1006,7 @@ def obtener_ubicacion(
 
     from datetime import timedelta
 
-    limite = datetime.utcnow() - timedelta(seconds=20)
+    limite = datetime.utcnow() - timedelta(minutes=5)
 
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.viaje_id == viaje_id,
@@ -1034,7 +1056,7 @@ def obtener_ubicacion_conductor(
 ):
 
     from datetime import timedelta
-    limite = datetime.utcnow() - timedelta(seconds=20)
+    limite = datetime.utcnow() - timedelta(minutes=5)
 
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.viaje_id == viaje_id,
