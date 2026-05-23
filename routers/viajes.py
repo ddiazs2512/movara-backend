@@ -336,7 +336,7 @@ def crear_viaje(
         Usuario.modo_actual == "conductor",
         Usuario.activo == True,
         Ubicacion.viaje_id == None,
-        Ubicacion.updated_at != None
+        Ubicacion.updated_at >= limite
     ).distinct(Usuario.id).all()
 
     if not conductores:
@@ -545,7 +545,20 @@ def viajes_disponibles(
 
     resultado = []
 
-    ubicacion_conductor = True
+    from datetime import timedelta
+
+    limite = datetime.utcnow() - timedelta(seconds=20)
+    
+    ubicacion_conductor = db.query(Ubicacion).filter(
+        Ubicacion.conductor_id == current_user.id,
+        Ubicacion.viaje_id == None,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
+    ).first()
+    
+    if not ubicacion_conductor:
+        return []
 
     for v in viajes:
 
@@ -729,7 +742,16 @@ def viajes_pendientes(
     from datetime import timedelta
     limite = datetime.utcnow() - timedelta(seconds=20)
 
-    ubicacion_conductor = True
+    ubicacion_conductor = db.query(Ubicacion).filter(
+        Ubicacion.conductor_id == current_user.id,
+        Ubicacion.viaje_id == None,
+        Ubicacion.updated_at >= limite
+    ).order_by(
+        Ubicacion.updated_at.desc()
+    ).first()
+    
+    if not ubicacion_conductor:
+        return []
 
     for v in viajes:
 
