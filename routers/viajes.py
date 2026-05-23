@@ -336,7 +336,7 @@ def crear_viaje(
         Usuario.modo_actual == "conductor",
         Usuario.activo == True,
         Ubicacion.viaje_id == None,
-        Ubicacion.updated_at >= limite
+        Ubicacion.updated_at != None
     ).distinct(Usuario.id).all()
 
     if not conductores:
