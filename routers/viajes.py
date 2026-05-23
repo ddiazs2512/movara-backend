@@ -335,8 +335,7 @@ def crear_viaje(
         Usuario.rol == "conductor",
         Usuario.modo_actual == "conductor",
         Usuario.activo == True,
-        Ubicacion.viaje_id == None,
-        Ubicacion.updated_at >= limite
+        Ubicacion.viaje_id == None
     ).distinct(Usuario.id).all()
 
     if not conductores:
@@ -365,7 +364,7 @@ def crear_viaje(
             ubicacion.lng
         )
         
-        if distancia <= 8000:
+        if distancia <= 4000:
             candidatos.append(c)
 
     # ======================
@@ -559,8 +558,7 @@ def viajes_disponibles(
     
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
-        Ubicacion.viaje_id == None,
-        Ubicacion.updated_at >= limite
+        Ubicacion.viaje_id == None
     ).order_by(
         Ubicacion.updated_at.desc()
     ).first()
@@ -584,7 +582,7 @@ def viajes_disponibles(
             v.lng_destino
         )
 
-        if distancia > 8000:
+        if distancia > 4000:
             continue
 
         resultado.append({
@@ -759,8 +757,7 @@ def viajes_pendientes(
 
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
-        Ubicacion.viaje_id == None,
-        Ubicacion.updated_at >= limite
+        Ubicacion.viaje_id == None
     ).order_by(
         Ubicacion.updated_at.desc()
     ).first()
@@ -781,7 +778,7 @@ def viajes_pendientes(
             v.lng_origen
         )
         
-        if distancia_conductor > 8000:
+        if distancia_conductor > 4000:
             continue
 
         ref = firebase_db.reference(f"viajes_activos/{v.id}")
