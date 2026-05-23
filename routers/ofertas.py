@@ -250,6 +250,16 @@ def responder_oferta(
 
         actualizar_estado_viaje(db, viaje, "en_camino")
 
+        firebase_db.reference(
+            f"viajes_activos/{viaje.id}"
+        ).update({
+            "estado": "en_camino",
+            "timestamp_estado": int(time.time() * 1000),
+            "metadata": {
+                "ultimo_update_por": "backend"
+            }
+        })
+
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == viaje.cliente_id,
             Usuario.activo == True
@@ -278,6 +288,16 @@ def responder_oferta(
             raise HTTPException(403, "No eres el conductor")
 
         actualizar_estado_viaje(db, viaje, "llegado")
+
+        firebase_db.reference(
+            f"viajes_activos/{viaje.id}"
+        ).update({
+            "estado": "llegado",
+            "timestamp_estado": int(time.time() * 1000),
+            "metadata": {
+                "ultimo_update_por": "backend"
+            }
+        })
 
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == viaje.cliente_id,
@@ -309,6 +329,17 @@ def responder_oferta(
             raise HTTPException(403, "No eres el conductor")
 
         actualizar_estado_viaje(db, viaje, "en_curso")
+
+        firebase_db.reference(
+            f"viajes_activos/{viaje.id}"
+        ).update({
+            "estado": "en_curso",
+            "timestamp_estado": int(time.time() * 1000),
+            "metadata": {
+                "ultimo_update_por": "backend"
+            }
+        })
+        
         viaje.fecha_inicio = datetime.utcnow()
         db.commit()
 
