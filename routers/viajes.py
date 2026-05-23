@@ -354,28 +354,11 @@ def crear_viaje(
             Ubicacion.conductor_id == c.id,
             Ubicacion.viaje_id == None
         ).order_by(Ubicacion.updated_at.desc()).first()
-
+    
         if not ubicacion:
             continue
-
-        distancia = calcular_distancia_metros(
-            nuevo.lat_origen,
-            nuevo.lng_origen,
-            ubicacion.lat,
-            ubicacion.lng
-        )
-
-        print("==============")
-        print("CLIENTE:", data.lat_origen, data.lng_origen)
-        print("CONDUCTOR:", ubicacion.lat, ubicacion.lng)
-        print("DISTANCIA:", distancia)
-        print("==============")
-
+    
         candidatos.append(c)
-
-    if not candidatos:
-        print("⚠️ No hay conductores cercanos, no se envía notificación")
-        candidatos = []
 
     # ======================
     # NOTIFICACIONES
