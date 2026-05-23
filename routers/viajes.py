@@ -545,7 +545,6 @@ def viajes_disponibles(
 
     resultado = []
 
-    # 🔥 UBICACIÓN DEL CONDUCTOR
     from datetime import timedelta
 
     limite = datetime.utcnow() - timedelta(seconds=20)
@@ -562,28 +561,11 @@ def viajes_disponibles(
     if not ubicacion_conductor:
         return []
 
-    # 🔥 RADIO MÁXIMO
-    MAX_DIST = 4000  # metros
-
     for v in viajes:
 
-        # ======================
-        # 📏 DISTANCIA
-        # ======================
-        distancia = calcular_distancia_metros(
-            ubicacion_conductor.lat,
-            ubicacion_conductor.lng,
-            v.lat_origen,
-            v.lng_origen
-        )
+        # 🔥 TEMPORAL
+        distancia = 0
 
-        # 🔥 FILTRO REAL (CLAVE)
-        if distancia > MAX_DIST:
-            continue
-
-        # ======================
-        # 🗺️ RUTA (OPCIONAL)
-        # ======================
         ruta = obtener_ruta_google(
             v.lat_origen,
             v.lng_origen,
@@ -607,7 +589,6 @@ def viajes_disponibles(
             "lng_destino": v.lng_destino,
             "ultimo_en_ofertar": None,
 
-            # 🔥 AHORA SÍ REAL
             "distancia_conductor_m": distancia,
 
             "ruta": {
@@ -620,7 +601,7 @@ def viajes_disponibles(
         })
 
     return resultado
-
+    
 @router.get("/viaje_activo", response_model=ViajeActivoResponse)
 def viaje_activo(
     current_user: Usuario = Depends(get_current_user),
@@ -742,9 +723,6 @@ def viajes_pendientes(
     db: Session = Depends(get_db)
 ):
 
-    # ======================
-    # 🔍 VALIDAR USUARIO
-    # ======================
     usuario = db.query(Usuario).filter(
         Usuario.id == current_user.id
     ).first()
@@ -752,15 +730,9 @@ def viajes_pendientes(
     if not usuario:
         raise HTTPException(404, "Usuario no encontrado")
 
-    # ======================
-    # 🔴 BLOQUEO SI NO ESTÁ ACTIVO
-    # ======================
     if usuario.rol == "conductor" and not usuario.activo:
         return []
 
-    # ======================
-    # 📦 TRAER VIAJES DISPONIBLES
-    # ======================
     viajes = db.query(Viaje).filter(
         Viaje.estado == "oferta",
         Viaje.conductor_id == None
@@ -771,7 +743,6 @@ def viajes_pendientes(
     from datetime import timedelta
     limite = datetime.utcnow() - timedelta(seconds=20)
 
-    # 🔥 UBICACIÓN DEL CONDUCTOR
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
         Ubicacion.viaje_id == None,
@@ -780,12 +751,8 @@ def viajes_pendientes(
         Ubicacion.updated_at.desc()
     ).first()
 
-    # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
     if not ubicacion_conductor:
         return []
-
-    # 🔥 RADIO MÁXIMO
-    MAX_DIST = 4000  # metros
 
     for v in viajes:
 
@@ -793,32 +760,17 @@ def viajes_pendientes(
             Usuario.id == v.cliente_id
         ).first()
 
-        # ======================
-        # 📏 CALCULAR DISTANCIA
-        # ======================
-        distancia_conductor = calcular_distancia_metros(
-            ubicacion_conductor.lat,
-            ubicacion_conductor.lng,
-            v.lat_origen,
-            v.lng_origen
-        )
+        # 🔥 TEMPORAL
+        distancia_conductor = 0
 
-        # 🔥 FILTRO REAL (CLAVE)
-        if distancia_conductor > MAX_DIST:
-            continue
-
-        # ======================
-        # 🔥 FIREBASE DATA
-        # ======================
         ref = firebase_db.reference(f"viajes_activos/{v.id}")
+
         try:
             data_fb = ref.get() or {}
+
         except:
             data_fb = {}
 
-        # ======================
-        # 📦 RESPUESTA
-        # ======================
         resultado.append({
             "id": v.id,
             "estado": v.estado,
