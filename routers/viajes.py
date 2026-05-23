@@ -545,21 +545,7 @@ def viajes_disponibles(
 
     resultado = []
 
-    from datetime import timedelta
-
-    limite = datetime.utcnow() - timedelta(seconds=20)
-
-    ubicacion_conductor = db.query(Ubicacion).filter(
-        Ubicacion.conductor_id == current_user.id,
-        Ubicacion.viaje_id == None,
-        Ubicacion.updated_at >= limite
-    ).order_by(
-        Ubicacion.updated_at.desc()
-    ).first()
-
-    # 🔴 SIN UBICACIÓN → NO MOSTRAR NADA
-    if not ubicacion_conductor:
-        return []
+    ubicacion_conductor = True
 
     for v in viajes:
 
