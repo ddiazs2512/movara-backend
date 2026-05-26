@@ -30,9 +30,16 @@ def actualizar_estado_viaje(db, viaje, nuevo_estado):
 
     ref = firebase_db.reference(f"viajes_activos/{viaje.id}")
 
+    estado_version = int(time.time() * 1000)
+
     data = {
+    
         "estado": nuevo_estado,
-        "timestamp_estado": int(time.time() * 1000),
+    
+        "estado_version": estado_version,
+    
+        "timestamp_estado": estado_version,
+    
         "metadata": {
             "ultimo_update_por": "backend"
         }
@@ -299,15 +306,18 @@ def crear_viaje(
 
     cliente = db.query(Usuario).filter(Usuario.id == nuevo.cliente_id).first()
 
+    estado_version = int(time.time() * 1000)
+    
     firebase_db.reference(f"viajes_activos/{nuevo.id}").set({
         "estado": "oferta",
+        "estado_version": estado_version,
         "cliente_id": nuevo.cliente_id,
         "cliente_nombre": cliente.nombre if cliente else "Cliente",
         "conductor_id": None,
         "precio_acordado": None,
         "precio_cliente": nuevo.precio_cliente_1,
         "ubicacion_conductor": None,
-        "timestamp_estado": int(time.time() * 1000),
+        "timestamp_estado": estado_version,
         "ofertas": {},
         "lat_origen": nuevo.lat_origen,
         "lng_origen": nuevo.lng_origen,
@@ -320,7 +330,6 @@ def crear_viaje(
             "ultimo_update_por": "backend"
         }
     })
-
     # ======================
     # CONDUCTORES DISPONIBLES
     # ======================
