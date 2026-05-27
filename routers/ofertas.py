@@ -183,39 +183,63 @@ def responder_oferta(
 
         if current_user.rol != "cliente":
             raise HTTPException(403, "Solo clientes pueden aceptar")
-
+    
         if viaje.cliente_id != current_user.id:
             raise HTTPException(403, "No eres el cliente")
-
+    
         if not data.conductor_id:
             raise HTTPException(400, "Falta conductor_id")
-
+    
         oferta = db.query(Oferta).filter(
             Oferta.viaje_id == data.viaje_id,
             Oferta.conductor_id == data.conductor_id,
             Oferta.estado == "activa"
         ).first()
-
+    
         if not oferta:
             raise HTTPException(404, "Oferta no encontrada")
-
+    
         # 🔒 TODO EN UNA SOLA FUNCIÓN
-        viaje = asignar_conductor_seguro(db, viaje.id, oferta.conductor_id)
-
+        viaje = asignar_conductor_seguro(
+            db,
+            viaje.id,
+            oferta.conductor_id
+        )
+    
         if viaje.estado != "asignado":
-            raise HTTPException(400, "estado_invalido_post_asignacion")
-
+            raise HTTPException(
+                400,
+                "estado_invalido_post_asignacion"
+            )
+    
         # 🔥 GUARDAR PRECIO
         viaje.precio_acordado = oferta.precio
-
+    
         db.commit()
         db.refresh(viaje)
-
+    
+        # =========================
+        # INFO CONDUCTOR
+        # =========================
+    
+        info_conductor = db.query(Conductor).filter(
+            Conductor.usuario_id == oferta.conductor_id
+        ).first()
+    
+        usuario_conductor = db.query(Usuario).filter(
+            Usuario.id == oferta.conductor_id
+        ).first()
+    
+        # =========================
+        # FCM
+        # =========================
+    
         tokens = db.query(FCMToken).filter(
             FCMToken.usuario_id == oferta.conductor_id
         ).all()
-
+    
         for t in tokens:
+    
             enviar_notificacion_data(
                 token=t.token,
                 data={
@@ -223,18 +247,53 @@ def responder_oferta(
                     "viaje_id": str(viaje.id)
                 }
             )
-
-        # 🔥 FIREBASE COMPLETO
-        firebase_db.reference(f"viajes_activos/{viaje.id}").update({
+    
+        # =========================
+        # FIREBASE
+        # =========================
+    
+        firebase_db.reference(
+            f"viajes_activos/{viaje.id}"
+        ).update({
+    
             "estado": "asignado",
+    
             "conductor_id": oferta.conductor_id,
+    
+            "conductor_nombre":
+                usuario_conductor.nombre
+                if usuario_conductor else None,
+    
+            "marca":
+                info_conductor.marca
+                if info_conductor else None,
+    
+            "modelo":
+                info_conductor.modelo
+                if info_conductor else None,
+    
+            "placa":
+                info_conductor.placa
+                if info_conductor else None,
+    
+            "color":
+                info_conductor.color_vehiculo
+                if info_conductor else None,
+    
             "precio_acordado": oferta.precio,
+    
             "ofertas": {},
-            "timestamp_estado": int(time.time() * 1000),
-            "metadata/ultimo_update_por": "backend"
+    
+            "timestamp_estado":
+                int(time.time() * 1000),
+    
+            "metadata/ultimo_update_por":
+                "backend"
         })
-
-        return {"mensaje": "Conductor elegido"}
+    
+        return {
+            "mensaje": "Conductor elegido"
+        }
 
     # ======================
     # EN CAMINO
