@@ -139,11 +139,20 @@ def responder_oferta(
         firebase_db.reference(
             f"viajes_activos/{viaje.id}/ofertas/{current_user.id}"
         ).set({
+        
             "oferta_id": oferta.id,
+        
             "conductor_id": current_user.id,
+        
             "conductor_nombre": usuario.nombre,
+        
             "precio": oferta.precio,
-            "timestamp": int(time.time())
+        
+            "timestamp": int(time.time()),
+        
+            "rating": usuario.rating or 0,
+        
+            "total_viajes": usuario.total_viajes or 0
         })
 
         version = int(time.time() * 1000)
