@@ -145,6 +145,7 @@ class ViajeActivoResponse(BaseModel):
     conductor_nombre: Optional[str]
 
     precio_acordado: Optional[float]
+    ofertas: list = []
 
     marca: Optional[str]
     modelo: Optional[str]
