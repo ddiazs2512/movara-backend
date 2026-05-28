@@ -701,6 +701,17 @@ def viaje_activo(
     conductor_usuario = viaje.conductor
 
     conductor = None
+    
+    ofertas = db.query(Oferta).filter(
+        Oferta.viaje_id == viaje.id,
+        Oferta.estado == "activa"
+    ).all()
+    
+    if viaje.conductor_id:
+        conductor = db.query(Conductor).filter(
+            Conductor.usuario_id == viaje.conductor_id
+        ).first()
+        
     if viaje.conductor_id:
         conductor = db.query(Conductor).filter(
             Conductor.usuario_id == viaje.conductor_id
@@ -727,6 +738,24 @@ def viaje_activo(
         conductor_nombre=conductor_usuario.nombre if conductor_usuario else None,
 
         precio_acordado=viaje.precio_acordado,
+        ofertas=[
+            {
+                "id": str(o.id),
+        
+                "conductor_id": o.conductor_id,
+        
+                "precio": o.precio,
+        
+                "conductor_nombre":
+                    o.conductor.nombre
+                    if o.conductor else None,
+        
+                "timestamp":
+                    int(o.fecha_creacion.timestamp() * 1000)
+                    if o.fecha_creacion else 0
+            }
+            for o in ofertas
+        ],
 
         marca=conductor.marca if conductor else None,
         modelo=conductor.modelo if conductor else None,
