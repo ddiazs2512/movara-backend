@@ -146,11 +146,18 @@ def responder_oferta(
             "timestamp": int(time.time())
         })
 
+        version = int(time.time() * 1000)
+        
         firebase_db.reference(
             f"viajes_activos/{viaje.id}"
         ).update({
+        
             "estado": "oferta_conductor",
-            "timestamp_estado": int(time.time() * 1000),
+        
+            "estado_version": version,
+        
+            "timestamp_estado": version,
+        
             "metadata": {
                 "ultimo_update_por": "backend"
             }
