@@ -268,41 +268,43 @@ def responder_oferta(
         # FIREBASE
         # =========================
     
+        version = int(time.time() * 1000)
+        
         firebase_db.reference(
             f"viajes_activos/{viaje.id}"
         ).update({
-    
+        
             "estado": "asignado",
-    
+        
+            "estado_version": version,
+            "timestamp_estado": version,
+        
             "conductor_id": oferta.conductor_id,
-    
+        
             "conductor_nombre":
                 usuario_conductor.nombre
                 if usuario_conductor else None,
-    
+        
             "marca":
                 info_conductor.marca
                 if info_conductor else None,
-    
+        
             "modelo":
                 info_conductor.modelo
                 if info_conductor else None,
-    
+        
             "placa":
                 info_conductor.placa
                 if info_conductor else None,
-    
+        
             "color":
                 info_conductor.color_vehiculo
                 if info_conductor else None,
-    
+        
             "precio_acordado": oferta.precio,
-    
+        
             "ofertas": {},
-    
-            "timestamp_estado":
-                int(time.time() * 1000),
-    
+        
             "metadata/ultimo_update_por":
                 "backend"
         })
@@ -325,11 +327,14 @@ def responder_oferta(
 
         actualizar_estado_viaje(db, viaje, "en_camino")
 
+        version = int(time.time() * 1000)
+
         firebase_db.reference(
             f"viajes_activos/{viaje.id}"
         ).update({
             "estado": "en_camino",
-            "timestamp_estado": int(time.time() * 1000),
+            "estado_version": version,
+            "timestamp_estado": version,
             "metadata": {
                 "ultimo_update_por": "backend"
             }
@@ -364,11 +369,14 @@ def responder_oferta(
 
         actualizar_estado_viaje(db, viaje, "llegado")
 
+        version = int(time.time() * 1000)
+
         firebase_db.reference(
             f"viajes_activos/{viaje.id}"
         ).update({
             "estado": "llegado",
-            "timestamp_estado": int(time.time() * 1000),
+            "estado_version": version,
+            "timestamp_estado": version,
             "metadata": {
                 "ultimo_update_por": "backend"
             }
@@ -405,11 +413,14 @@ def responder_oferta(
 
         actualizar_estado_viaje(db, viaje, "en_curso")
 
+        version = int(time.time() * 1000)
+
         firebase_db.reference(
             f"viajes_activos/{viaje.id}"
         ).update({
             "estado": "en_curso",
-            "timestamp_estado": int(time.time() * 1000),
+            "estado_version": version,
+            "timestamp_estado": version,
             "metadata": {
                 "ultimo_update_por": "backend"
             }
@@ -438,34 +449,48 @@ def responder_oferta(
     # EN_CURSO
     # ======================
 
-    elif data.accion == "en_curso":
+  elif data.accion == "en_curso":
 
-        if current_user.rol != "conductor":
-            raise HTTPException(403, "Solo conductores")
+    if current_user.rol != "conductor":
+        raise HTTPException(403, "Solo conductores")
 
-        if viaje.conductor_id != current_user.id:
-            raise HTTPException(403, "No eres el conductor")
+    if viaje.conductor_id != current_user.id:
+        raise HTTPException(403, "No eres el conductor")
 
-        # 🔥 MISMO FLUJO QUE "iniciar"
-        actualizar_estado_viaje(db, viaje, "en_curso")
-        viaje.fecha_inicio = datetime.utcnow()
-        db.commit()
+    actualizar_estado_viaje(db, viaje, "en_curso")
 
-        tokens = db.query(FCMToken).filter(
-            FCMToken.usuario_id == viaje.cliente_id
-        ).all()
+    viaje.fecha_inicio = datetime.utcnow()
+    db.commit()
 
-        for t in tokens:
-            enviar_notificacion_data(
-                token=t.token,
-                data={
-                    "type": "viaje_iniciado",
-                    "viaje_id": str(viaje.id)
-                }
-            )
+    version = int(time.time() * 1000)
 
-        return {"mensaje": "Viaje iniciado"}
+    firebase_db.reference(
+        f"viajes_activos/{viaje.id}"
+    ).update({
+        "estado": "en_curso",
+        "estado_version": version,
+        "timestamp_estado": version,
+        "metadata": {
+            "ultimo_update_por": "backend"
+        }
+    })
 
+    tokens = db.query(FCMToken).filter(
+        FCMToken.usuario_id == viaje.cliente_id
+    ).all()
+
+    for t in tokens:
+        enviar_notificacion_data(
+            token=t.token,
+            data={
+                "type": "viaje_iniciado",
+                "viaje_id": str(viaje.id)
+            }
+        )
+
+    return {
+        "mensaje": "Viaje iniciado"
+    }
     # ======================
     # FINALIZAR
     # ======================
@@ -486,9 +511,14 @@ def responder_oferta(
         db.refresh(viaje)
 
         # 🔥 ACTUALIZAR FIREBASE
-        firebase_db.reference(f"viajes_activos/{viaje.id}").update({
+        version = int(time.time() * 1000)
+
+        firebase_db.reference(
+            f"viajes_activos/{viaje.id}"
+        ).update({
             "estado": "finalizado",
-            "timestamp_estado": int(time.time() * 1000),
+            "estado_version": version,
+            "timestamp_estado": version,
             "metadata/ultimo_update_por": "backend"
         })
 
