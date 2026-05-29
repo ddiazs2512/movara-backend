@@ -746,9 +746,7 @@ def viaje_activo(
         
                 "precio": o.precio,
         
-                "conductor_nombre":
-                    o.conductor.nombre
-                    if o.conductor else None,
+                "conductor_nombre": None,
         
                 "timestamp":
                     int(o.fecha_creacion.timestamp() * 1000)
