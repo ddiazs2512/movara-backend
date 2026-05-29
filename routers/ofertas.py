@@ -449,8 +449,8 @@ def responder_oferta(
     # EN_CURSO
     # ======================
 
-      elif data.accion == "en_curso":
-    
+    elif data.accion == "en_curso":
+
         if current_user.rol != "conductor":
             raise HTTPException(403, "Solo conductores")
     
