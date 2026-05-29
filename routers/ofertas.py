@@ -449,48 +449,48 @@ def responder_oferta(
     # EN_CURSO
     # ======================
 
-  elif data.accion == "en_curso":
-
-    if current_user.rol != "conductor":
-        raise HTTPException(403, "Solo conductores")
-
-    if viaje.conductor_id != current_user.id:
-        raise HTTPException(403, "No eres el conductor")
-
-    actualizar_estado_viaje(db, viaje, "en_curso")
-
-    viaje.fecha_inicio = datetime.utcnow()
-    db.commit()
-
-    version = int(time.time() * 1000)
-
-    firebase_db.reference(
-        f"viajes_activos/{viaje.id}"
-    ).update({
-        "estado": "en_curso",
-        "estado_version": version,
-        "timestamp_estado": version,
-        "metadata": {
-            "ultimo_update_por": "backend"
-        }
-    })
-
-    tokens = db.query(FCMToken).filter(
-        FCMToken.usuario_id == viaje.cliente_id
-    ).all()
-
-    for t in tokens:
-        enviar_notificacion_data(
-            token=t.token,
-            data={
-                "type": "viaje_iniciado",
-                "viaje_id": str(viaje.id)
+      elif data.accion == "en_curso":
+    
+        if current_user.rol != "conductor":
+            raise HTTPException(403, "Solo conductores")
+    
+        if viaje.conductor_id != current_user.id:
+            raise HTTPException(403, "No eres el conductor")
+    
+        actualizar_estado_viaje(db, viaje, "en_curso")
+    
+        viaje.fecha_inicio = datetime.utcnow()
+        db.commit()
+    
+        version = int(time.time() * 1000)
+    
+        firebase_db.reference(
+            f"viajes_activos/{viaje.id}"
+        ).update({
+            "estado": "en_curso",
+            "estado_version": version,
+            "timestamp_estado": version,
+            "metadata": {
+                "ultimo_update_por": "backend"
             }
-        )
-
-    return {
-        "mensaje": "Viaje iniciado"
-    }
+        })
+    
+        tokens = db.query(FCMToken).filter(
+            FCMToken.usuario_id == viaje.cliente_id
+        ).all()
+    
+        for t in tokens:
+            enviar_notificacion_data(
+                token=t.token,
+                data={
+                    "type": "viaje_iniciado",
+                    "viaje_id": str(viaje.id)
+                }
+            )
+    
+        return {
+            "mensaje": "Viaje iniciado"
+        }
     # ======================
     # FINALIZAR
     # ======================
