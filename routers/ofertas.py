@@ -167,6 +167,10 @@ def responder_oferta(
         
             "timestamp_estado": version,
         
+            "ultimo_en_ofertar": "conductor",
+
+            "precio_conductor": oferta.precio,
+        
             "metadata": {
                 "ultimo_update_por": "backend"
             }
