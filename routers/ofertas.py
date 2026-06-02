@@ -161,7 +161,7 @@ def responder_oferta(
             f"viajes_activos/{viaje.id}"
         ).update({
         
-            "estado": "oferta_conductor",
+            "estado": "oferta",
         
             "estado_version": version,
         
