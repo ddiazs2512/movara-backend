@@ -39,7 +39,11 @@ async def ws_test(
     await manager.enviar(
         viaje_id,
         {
-            "evento": "prueba"
+            "tipo": "viaje_aceptado",
+            "payload": {
+                "viaje_id": viaje_id,
+                "conductor_id": 999
+            }
         }
     )
 
