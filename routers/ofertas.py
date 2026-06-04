@@ -11,6 +11,7 @@ from models import Viaje, Oferta, Conductor, Usuario, FCMToken, puede_transicion
 from routers.usuarios import get_current_user
 from firebase_service import enviar_notificacion_data
 from routers.viajes import actualizar_estado_viaje
+from websocket_manager import manager
 
 
 router = APIRouter()
@@ -63,7 +64,7 @@ def obtener_ofertas(
 # RESPONDER OFERTA
 # ======================
 @router.post("/responder_oferta")
-def responder_oferta(
+async def responder_oferta(
     data: ResponderOfertaRequest,
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user)
@@ -237,6 +238,17 @@ def responder_oferta(
     
         db.commit()
         db.refresh(viaje)
+
+        await manager.enviar(
+            viaje.id,
+            {
+                "tipo": "viaje_aceptado",
+                "payload": {
+                    "viaje_id": viaje.id,
+                    "conductor_id": oferta.conductor_id
+                }
+            }
+        )
     
         # =========================
         # INFO CONDUCTOR
