@@ -36,9 +36,33 @@ class ConnectionManager:
         viaje_id: int,
         data: dict
     ):
+
         ws = self.connections.get(viaje_id)
 
-        if ws:
+        if not ws:
+            print(
+                f"WS no conectado viaje={viaje_id}"
+            )
+            return False
+
+        try:
+
             await ws.send_json(data)
+
+            print(
+                f"WS enviado viaje={viaje_id}"
+            )
+
+            return True
+
+        except Exception as e:
+
+            print(
+                f"WS error viaje={viaje_id}: {e}"
+            )
+
+            self.disconnect(viaje_id)
+
+            return False
 
 manager = ConnectionManager()
