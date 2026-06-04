@@ -136,6 +136,21 @@ async def responder_oferta(
         db.commit()
         db.refresh(oferta)
 
+        await manager.enviar(
+            viaje.id,
+            {
+                "tipo": "oferta_recibida",
+                "payload": {
+                    "oferta_id": oferta.id,
+                    "conductor_id": current_user.id,
+                    "conductor_nombre": usuario.nombre,
+                    "precio": oferta.precio,
+                    "rating": usuario.rating or 0,
+                    "total_viajes": usuario.total_viajes or 0
+                }
+            }
+        )
+
         # 🔥 FIREBASE (SIN push)
         firebase_db.reference(
             f"viajes_activos/{viaje.id}/ofertas/{current_user.id}"
