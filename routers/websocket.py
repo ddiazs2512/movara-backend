@@ -27,7 +27,8 @@ async def websocket_viaje(
     except WebSocketDisconnect:
 
         manager.disconnect(
-            viaje_id
+            viaje_id,
+            websocket
         )
 
 @router.get("/ws-test/{viaje_id}")
