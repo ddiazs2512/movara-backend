@@ -17,6 +17,7 @@ from models import puede_transicionar
 from routers.usuarios import get_current_user
 from schemas import ViajeActivoResponse
 from fastapi import Request
+from websocket_manager import manager
 
 def actualizar_estado_viaje(db, viaje, nuevo_estado):
     if not puede_transicionar(viaje.estado, nuevo_estado):
@@ -49,6 +50,29 @@ def actualizar_estado_viaje(db, viaje, nuevo_estado):
         ref.update(data)
     except Exception as e:
         print("❌ FIREBASE FALLÓ - ESTADO DESINCRONIZADO:", e)
+
+    try:
+
+        import asyncio
+    
+        asyncio.create_task(
+    
+            manager.enviar(
+                viaje.id,
+                {
+                    "tipo": nuevo_estado,
+                    "payload": {
+                        "viaje_id": viaje.id
+                    }
+                }
+            )
+        )
+    
+    except Exception as e:
+    
+        print(
+            f"❌ WS FALLÓ: {e}"
+        )
 
     return viaje
 
