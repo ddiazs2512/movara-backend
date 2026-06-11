@@ -136,6 +136,14 @@ async def responder_oferta(
         db.commit()
         db.refresh(oferta)
 
+        from routers.conductor_ws import refresh_conductor
+
+        asyncio.create_task(
+            refresh_conductor(
+                current_user.id
+            )
+        )
+
         await manager.enviar(
             viaje.id,
             {
@@ -253,6 +261,16 @@ async def responder_oferta(
     
         db.commit()
         db.refresh(viaje)
+
+        from routers.conductor_ws import refresh_conductor
+
+        import asyncio
+        
+        asyncio.create_task(
+            refresh_conductor(
+                oferta.conductor_id
+            )
+        )
 
         await manager.enviar(
             viaje.id,
