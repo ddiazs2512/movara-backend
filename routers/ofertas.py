@@ -527,6 +527,10 @@ async def responder_oferta(
     # ======================
     elif data.accion == "finalizar":
 
+        print(
+            f"FINALIZAR viaje={viaje.id} estado_actual={viaje.estado}"
+        )
+
         if current_user.rol != "conductor":
             raise HTTPException(403, "Solo conductores")
 
