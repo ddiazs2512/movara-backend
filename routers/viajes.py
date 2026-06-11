@@ -316,6 +316,14 @@ def crear_viaje(
     db.commit()
     db.refresh(nuevo)
 
+    from routers.mercado_ws import broadcast_refresh
+
+    import asyncio
+    
+    asyncio.create_task(
+        broadcast_refresh()
+    )
+
     # ======================
     # FIREBASE
     # ======================
