@@ -52,21 +52,6 @@ def actualizar_estado_viaje(db, viaje, nuevo_estado):
         print("❌ FIREBASE FALLÓ - ESTADO DESINCRONIZADO:", e)
 
     try:
-
-        import asyncio
-    
-        asyncio.create_task(
-    
-            manager.enviar(
-                viaje.id,
-                {
-                    "tipo": nuevo_estado,
-                    "payload": {
-                        "viaje_id": viaje.id
-                    }
-                }
-            )
-        )
     
     except Exception as e:
     
@@ -315,14 +300,6 @@ def crear_viaje(
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
-
-    from routers.mercado_ws import broadcast_refresh
-
-    import asyncio
-    
-    asyncio.create_task(
-        broadcast_refresh()
-    )
 
     # ======================
     # FIREBASE
