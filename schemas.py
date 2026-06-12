@@ -109,6 +109,9 @@ class ViajeResponse(BaseModel):
     lat_destino: float
     lng_destino: float
 
+    lat_conductor: Optional[float]
+    lng_conductor: Optional[float]
+
     referencia_recojo: Optional[str]
     destino_referencia: Optional[str]
 
@@ -124,7 +127,7 @@ class ViajeResponse(BaseModel):
     modelo: Optional[str]
     color_vehiculo: Optional[str]
     placa: Optional[str]
-
+    
 class ViajeActivoResponse(BaseModel):
     activo: bool
 
