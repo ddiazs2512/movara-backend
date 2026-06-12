@@ -26,17 +26,14 @@ app = FastAPI()
 # FIREBASE
 # ======================
 firebase_path = os.getenv("FIREBASE_CREDENTIALS")
-firebase_url = os.getenv("FIREBASE_DB_URL")
 
-if not firebase_path or not firebase_url:
-    raise Exception("Faltan variables FIREBASE en .env")
+if not firebase_path:
+    raise Exception("Falta FIREBASE_CREDENTIALS")
 
 cred = credentials.Certificate(firebase_path)
 
 if not firebase_admin._apps:
-    firebase_admin.initialize_app(cred, {
-        "databaseURL": firebase_url
-    })
+    firebase_admin.initialize_app(cred)
 
 # ======================
 # DB
