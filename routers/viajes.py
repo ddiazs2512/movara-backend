@@ -10,7 +10,6 @@ from database import get_db
 from firebase_service import enviar_notificacion_data
 import math
 from schemas import ResponderOfertaRequest, ViajeResponse
-from firebase_admin import db as firebase_db
 import time
 import requests
 from models import puede_transicionar
@@ -28,34 +27,6 @@ def actualizar_estado_viaje(db, viaje, nuevo_estado):
 
     db.commit()
     db.refresh(viaje)
-
-    ref = firebase_db.reference(f"viajes_activos/{viaje.id}")
-
-    estado_version = int(time.time() * 1000)
-
-    data = {
-    
-        "estado": nuevo_estado,
-    
-        "estado_version": estado_version,
-    
-        "timestamp_estado": estado_version,
-    
-        "metadata": {
-            "ultimo_update_por": "backend"
-        }
-    }
-
-    try:
-        ref.update(data)
-    except Exception as e:
-        print("❌ FIREBASE FALLÓ - ESTADO DESINCRONIZADO:", e)
-    
-    except Exception as e:
-    
-        print(
-            f"❌ WS FALLÓ: {e}"
-        )
 
     return viaje
 
@@ -110,18 +81,6 @@ def asignar_conductor_seguro(db: Session, viaje_id: int, conductor_id: int):
     viaje.conductor_id = conductor_id
     actualizar_estado_viaje(db, viaje, "asignado")
     db.refresh(viaje)
-
-    # =========================
-    # 🔥 FIREBASE (DESPUÉS)
-    # =========================
-    try:
-        firebase_db.reference(f"viajes_activos/{viaje.id}").update({
-            "ofertas": None,          # 🔥 mejor que {}
-            "conductor_id": conductor_id
-        })
-    except Exception as e:
-        # ⚠️ LOG, pero NO romper flujo
-        print(f"ERROR FIREBASE: {e}")
 
     return viaje
 
@@ -298,45 +257,7 @@ def crear_viaje(
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
-
-    # ======================
-    # FIREBASE
-    # ======================
-    from firebase_admin import db as firebase_db
-
-    ruta = obtener_ruta_google(
-        nuevo.lat_origen,
-        nuevo.lng_origen,
-        nuevo.lat_destino,
-        nuevo.lng_destino
-    )
-
-    cliente = db.query(Usuario).filter(Usuario.id == nuevo.cliente_id).first()
-
-    estado_version = int(time.time() * 1000)
     
-    firebase_db.reference(f"viajes_activos/{nuevo.id}").set({
-        "estado": "oferta",
-        "estado_version": estado_version,
-        "cliente_id": nuevo.cliente_id,
-        "cliente_nombre": cliente.nombre if cliente else "Cliente",
-        "conductor_id": None,
-        "precio_acordado": None,
-        "precio_cliente": nuevo.precio_cliente_1,
-        "ubicacion_conductor": None,
-        "timestamp_estado": estado_version,
-        "ofertas": {},
-        "lat_origen": nuevo.lat_origen,
-        "lng_origen": nuevo.lng_origen,
-        "lat_destino": nuevo.lat_destino,
-        "lng_destino": nuevo.lng_destino,
-        "ruta": ruta if ruta else None,
-        "metadata": {
-            "origen": nuevo.referencia_recojo,
-            "destino": nuevo.destino_referencia,
-            "ultimo_update_por": "backend"
-        }
-    })
     # ======================
     # CONDUCTORES DISPONIBLES
     # ======================
@@ -671,14 +592,6 @@ def viaje_activo(
                 "cancelado"
             )
 
-            try:
-                firebase_db.reference(
-                    f"viajes_activos/{viaje.id}"
-                ).delete()
-
-            except Exception as e:
-                print("❌ ERROR ELIMINANDO FIREBASE:", e)
-
             viaje = None
 
     # ❌ NO HAY VIAJE ACTIVO
@@ -826,12 +739,6 @@ def viajes_pendientes(
 
         ref = firebase_db.reference(f"viajes_activos/{v.id}")
 
-        try:
-            data_fb = ref.get() or {}
-
-        except:
-            data_fb = {}
-
         resultado.append({
             "id": v.id,
             "estado": v.estado,
@@ -849,7 +756,18 @@ def viajes_pendientes(
 
             "distancia_conductor_m": distancia_conductor,
 
-            "ruta": data_fb.get("ruta") if data_fb else None
+            ruta = obtener_ruta_google(
+                v.lat_origen,
+                v.lng_origen,
+                v.lat_destino,
+                v.lng_destino
+            )
+            
+            "ruta": {
+                "distancia_texto": ruta["distancia_texto"] if ruta else None,
+                "duracion_texto": ruta["duracion_texto"] if ruta else None,
+                "polyline": ruta["polyline"] if ruta else None
+            } if ruta else None
         })
 
     return resultado
@@ -1007,25 +925,6 @@ def actualizar_ubicacion(
         raise HTTPException(500, f"db_error:{str(e)}")
 
     # ======================
-    # FIREBASE
-    # ======================
-
-    try:
-        firebase_db.reference(f"viajes_activos/{viaje.id}").update({
-            "ubicacion_conductor": {
-                "lat": data.lat,
-                "lng": data.lng
-            },
-            "timestamp_estado": int(time.time() * 1000),
-            "metadata/ultimo_update_por": "backend"
-        })
-        print(f"[TRACK] FB_OK viaje={viaje.id}")
-
-    except Exception as e:
-        print(f"[TRACK] FB_ERROR viaje={viaje.id} error={str(e)}")
-        raise HTTPException(500, f"firebase_error:{str(e)}")
-
-    # ======================
     # RESPUESTA
     # ======================
 
@@ -1176,8 +1075,6 @@ def cancelar_viaje(
         )
 
     actualizar_estado_viaje(db, viaje, "cancelado")
-
-    firebase_db.reference(f"viajes_activos/{viaje.id}").delete()
 
     return {"mensaje": "Viaje cancelado"}
 
