@@ -272,8 +272,6 @@ async def responder_oferta(
         db.refresh(viaje)
 
         from routers.conductor_ws import refresh_conductor
-
-        import asyncio
         
         asyncio.create_task(
             refresh_conductor(
