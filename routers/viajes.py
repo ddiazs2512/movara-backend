@@ -555,8 +555,7 @@ def viaje_activo(
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    
-    # 🔥 BUSCAR VIAJE ACTIVO (CLIENTE O CONDUCTOR)
+
     viaje = db.query(Viaje).filter(
         (
             (Viaje.cliente_id == current_user.id) |
@@ -569,21 +568,20 @@ def viaje_activo(
             "llegado",
             "en_curso"
         ])
-    ).order_by(Viaje.id.desc()).first()
+    ).order_by(
+        Viaje.id.desc()
+    ).first()
 
     from datetime import timedelta
 
-    # ======================
-    # ⏰ AUTO CANCELAR VIAJES VIEJOS
-    # ======================
-
     if viaje and viaje.estado == "oferta":
 
-        tiempo_pasado = datetime.utcnow() - viaje.fecha_creacion
+        tiempo_pasado = (
+            datetime.utcnow() -
+            viaje.fecha_creacion
+        )
 
         if tiempo_pasado > timedelta(minutes=15):
-
-            print(f"⏰ VIAJE EXPIRADO {viaje.id}")
 
             actualizar_estado_viaje(
                 db,
@@ -593,8 +591,8 @@ def viaje_activo(
 
             viaje = None
 
-    # ❌ NO HAY VIAJE ACTIVO
     if not viaje:
+
         return ViajeActivoResponse(
             activo=False,
             id=None,
@@ -603,6 +601,8 @@ def viaje_activo(
             lng_origen=None,
             lat_destino=None,
             lng_destino=None,
+            lat_conductor=None,
+            lng_conductor=None,
             destino_referencia=None,
             cliente_id=None,
             cliente_nombre=None,
@@ -615,71 +615,65 @@ def viaje_activo(
             placa=None
         )
 
-    # 👤 CLIENTE
     cliente = viaje.cliente
     conductor_usuario = viaje.conductor
 
-    conductor = None
-    
     ofertas = db.query(Oferta).filter(
         Oferta.viaje_id == viaje.id,
         Oferta.estado == "activa"
     ).all()
 
-    print("========== VIAJE_ACTIVO ==========")
-    print(f"viaje={viaje.id}")
-    print(f"estado={viaje.estado}")
-    print(f"ofertas={len(ofertas)}")
-    
-    for o in ofertas:
-        print(
-            f"oferta id={o.id} "
-            f"conductor={o.conductor_id} "
-            f"precio={o.precio} "
-            f"estado={o.estado}"
-        )
-    
+    ubicacion = db.query(Ubicacion).filter(
+        Ubicacion.viaje_id == viaje.id
+    ).order_by(
+        Ubicacion.updated_at.desc()
+    ).first()
+
+    conductor = None
+
     if viaje.conductor_id:
-        conductor = db.query(Conductor).filter(
-            Conductor.usuario_id == viaje.conductor_id
-        ).first()
-        
-    if viaje.conductor_id:
+
         conductor = db.query(Conductor).filter(
             Conductor.usuario_id == viaje.conductor_id
         ).first()
 
-    # ✅ RESPUESTA CORRECTA
     return ViajeActivoResponse(
         activo=True,
-        id=viaje.id,
 
-        # 🔥 CLAVE: ahora sí devolvemos estado
+        id=viaje.id,
         estado=viaje.estado,
 
         lat_origen=viaje.lat_origen,
         lng_origen=viaje.lng_origen,
+
         lat_destino=viaje.lat_destino,
         lng_destino=viaje.lng_destino,
+
+        lat_conductor=
+            ubicacion.lat if ubicacion else None,
+
+        lng_conductor=
+            ubicacion.lng if ubicacion else None,
+
         destino_referencia=viaje.destino_referencia,
 
         cliente_id=viaje.cliente_id,
-        cliente_nombre=cliente.nombre if cliente else None,
+        cliente_nombre=
+            cliente.nombre if cliente else None,
 
         conductor_id=viaje.conductor_id,
-        conductor_nombre=conductor_usuario.nombre if conductor_usuario else None,
+        conductor_nombre=
+            conductor_usuario.nombre
+            if conductor_usuario else None,
 
         precio_acordado=viaje.precio_acordado,
+
         ofertas=[
             {
                 "id": str(o.id),
-        
                 "conductor_id": o.conductor_id,
-        
                 "precio": o.precio,
-        
                 "conductor_nombre": None,
-        
                 "timestamp":
                     int(o.fecha_creacion.timestamp() * 1000)
                     if o.fecha_creacion else 0
@@ -689,7 +683,8 @@ def viaje_activo(
 
         marca=conductor.marca if conductor else None,
         modelo=conductor.modelo if conductor else None,
-        color_vehiculo=conductor.color_vehiculo if conductor else None,
+        color_vehiculo=
+            conductor.color_vehiculo if conductor else None,
         placa=conductor.placa if conductor else None
     )
 
