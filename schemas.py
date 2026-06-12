@@ -133,8 +133,12 @@ class ViajeActivoResponse(BaseModel):
 
     lat_origen: Optional[float]
     lng_origen: Optional[float]
+
     lat_destino: Optional[float]
     lng_destino: Optional[float]
+
+    lat_conductor: Optional[float]
+    lng_conductor: Optional[float]
 
     destino_referencia: Optional[str]
 
