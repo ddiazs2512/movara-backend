@@ -12,6 +12,7 @@ from routers.usuarios import get_current_user
 from firebase_service import enviar_notificacion_data
 from routers.viajes import actualizar_estado_viaje
 from websocket_manager import manager
+import asyncio
 
 
 router = APIRouter()
@@ -138,10 +139,18 @@ async def responder_oferta(
 
         from routers.conductor_ws import refresh_conductor
 
+        print(
+            f"ANTES_REFRESH conductor={current_user.id}"
+        )
+        
         asyncio.create_task(
             refresh_conductor(
                 current_user.id
             )
+        )
+        
+        print(
+            f"DESPUES_REFRESH conductor={current_user.id}"
         )
 
         await manager.enviar(
