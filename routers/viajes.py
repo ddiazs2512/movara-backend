@@ -50,8 +50,6 @@ def actualizar_estado_viaje(db, viaje, nuevo_estado):
         ref.update(data)
     except Exception as e:
         print("❌ FIREBASE FALLÓ - ESTADO DESINCRONIZADO:", e)
-
-    try:
     
     except Exception as e:
     
