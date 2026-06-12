@@ -379,9 +379,6 @@ async def responder_oferta(
         db.commit()
         db.refresh(viaje)
 
-        # 🔥 ELIMINAR NODO (CLAVE)
-        firebase_db.reference(f"viajes_activos/{viaje.id}").delete()
-
         # 🔥 ACTUALIZAR MÉTRICAS
         conductor_user = db.query(Usuario).filter(
             Usuario.id == viaje.conductor_id
