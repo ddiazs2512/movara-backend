@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from datetime import datetime
 from database import SessionLocal
 import time
-from firebase_admin import db as firebase_db
 from routers.viajes import asignar_conductor_seguro
 from database import get_db
 from models import Viaje, Oferta, Conductor, Usuario, FCMToken, puede_transicionar
@@ -168,47 +167,6 @@ async def responder_oferta(
             }
         )
 
-        # 🔥 FIREBASE (SIN push)
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}/ofertas/{current_user.id}"
-        ).set({
-        
-            "oferta_id": oferta.id,
-        
-            "conductor_id": current_user.id,
-        
-            "conductor_nombre": usuario.nombre,
-        
-            "precio": oferta.precio,
-        
-            "timestamp": int(time.time()),
-        
-            "rating": usuario.rating or 0,
-        
-            "total_viajes": usuario.total_viajes or 0
-        })
-
-        version = int(time.time() * 1000)
-        
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-        
-            "estado": "oferta",
-        
-            "estado_version": version,
-        
-            "timestamp_estado": version,
-        
-            "ultimo_en_ofertar": "conductor",
-
-            "precio_conductor": oferta.precio,
-        
-            "metadata": {
-                "ultimo_update_por": "backend"
-            }
-        })
-
         return {"mensaje": "Oferta enviada"}
 
     # ======================
@@ -320,51 +278,6 @@ async def responder_oferta(
                 }
             )
     
-        # =========================
-        # FIREBASE
-        # =========================
-    
-        version = int(time.time() * 1000)
-        
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-        
-            "estado": "asignado",
-        
-            "estado_version": version,
-            "timestamp_estado": version,
-        
-            "conductor_id": oferta.conductor_id,
-        
-            "conductor_nombre":
-                usuario_conductor.nombre
-                if usuario_conductor else None,
-        
-            "marca":
-                info_conductor.marca
-                if info_conductor else None,
-        
-            "modelo":
-                info_conductor.modelo
-                if info_conductor else None,
-        
-            "placa":
-                info_conductor.placa
-                if info_conductor else None,
-        
-            "color":
-                info_conductor.color_vehiculo
-                if info_conductor else None,
-        
-            "precio_acordado": oferta.precio,
-        
-            "ofertas": {},
-        
-            "metadata/ultimo_update_por":
-                "backend"
-        })
-    
         return {
             "mensaje": "Conductor elegido"
         }
@@ -382,19 +295,6 @@ async def responder_oferta(
             raise HTTPException(403, "No eres el conductor")
 
         actualizar_estado_viaje(db, viaje, "en_camino")
-
-        version = int(time.time() * 1000)
-
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-            "estado": "en_camino",
-            "estado_version": version,
-            "timestamp_estado": version,
-            "metadata": {
-                "ultimo_update_por": "backend"
-            }
-        })
 
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == viaje.cliente_id,
@@ -424,19 +324,6 @@ async def responder_oferta(
             raise HTTPException(403, "No eres el conductor")
 
         actualizar_estado_viaje(db, viaje, "llegado")
-
-        version = int(time.time() * 1000)
-
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-            "estado": "llegado",
-            "estado_version": version,
-            "timestamp_estado": version,
-            "metadata": {
-                "ultimo_update_por": "backend"
-            }
-        })
 
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == viaje.cliente_id,
@@ -468,19 +355,6 @@ async def responder_oferta(
             raise HTTPException(403, "No eres el conductor")
 
         actualizar_estado_viaje(db, viaje, "en_curso")
-
-        version = int(time.time() * 1000)
-
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-            "estado": "en_curso",
-            "estado_version": version,
-            "timestamp_estado": version,
-            "metadata": {
-                "ultimo_update_por": "backend"
-            }
-        })
         
         viaje.fecha_inicio = datetime.utcnow()
         db.commit()
@@ -517,19 +391,6 @@ async def responder_oferta(
     
         viaje.fecha_inicio = datetime.utcnow()
         db.commit()
-    
-        version = int(time.time() * 1000)
-    
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-            "estado": "en_curso",
-            "estado_version": version,
-            "timestamp_estado": version,
-            "metadata": {
-                "ultimo_update_por": "backend"
-            }
-        })
     
         tokens = db.query(FCMToken).filter(
             FCMToken.usuario_id == viaje.cliente_id
@@ -569,18 +430,6 @@ async def responder_oferta(
         viaje.fecha_fin = datetime.utcnow()
         db.commit()
         db.refresh(viaje)
-
-        # 🔥 ACTUALIZAR FIREBASE
-        version = int(time.time() * 1000)
-
-        firebase_db.reference(
-            f"viajes_activos/{viaje.id}"
-        ).update({
-            "estado": "finalizado",
-            "estado_version": version,
-            "timestamp_estado": version,
-            "metadata/ultimo_update_por": "backend"
-        })
 
         # 🔥 ELIMINAR NODO (CLAVE)
         firebase_db.reference(f"viajes_activos/{viaje.id}").delete()
