@@ -625,6 +625,19 @@ def viaje_activo(
         Oferta.viaje_id == viaje.id,
         Oferta.estado == "activa"
     ).all()
+
+    print("========== VIAJE_ACTIVO ==========")
+    print(f"viaje={viaje.id}")
+    print(f"estado={viaje.estado}")
+    print(f"ofertas={len(ofertas)}")
+    
+    for o in ofertas:
+        print(
+            f"oferta id={o.id} "
+            f"conductor={o.conductor_id} "
+            f"precio={o.precio} "
+            f"estado={o.estado}"
+        )
     
     if viaje.conductor_id:
         conductor = db.query(Conductor).filter(
