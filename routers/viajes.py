@@ -708,16 +708,13 @@ def viajes_pendientes(
 
     resultado = []
 
-    from datetime import timedelta
-    limite = datetime.utcnow() - timedelta(minutes=5)
-
     ubicacion_conductor = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
         Ubicacion.viaje_id == None
     ).order_by(
         Ubicacion.updated_at.desc()
     ).first()
-    
+
     if not ubicacion_conductor:
         return []
 
@@ -733,11 +730,16 @@ def viajes_pendientes(
             v.lat_origen,
             v.lng_origen
         )
-        
+
         if distancia_conductor > 4000:
             continue
 
-        ref = firebase_db.reference(f"viajes_activos/{v.id}")
+        ruta = obtener_ruta_google(
+            v.lat_origen,
+            v.lng_origen,
+            v.lat_destino,
+            v.lng_destino
+        )
 
         resultado.append({
             "id": v.id,
@@ -756,13 +758,6 @@ def viajes_pendientes(
 
             "distancia_conductor_m": distancia_conductor,
 
-            ruta = obtener_ruta_google(
-                v.lat_origen,
-                v.lng_origen,
-                v.lat_destino,
-                v.lng_destino
-            )
-            
             "ruta": {
                 "distancia_texto": ruta["distancia_texto"] if ruta else None,
                 "duracion_texto": ruta["duracion_texto"] if ruta else None,
@@ -771,7 +766,6 @@ def viajes_pendientes(
         })
 
     return resultado
-
 # ======================
 # MIS VIAJES (CONDUCTOR) - ENRIQUECIDO
 # ======================
