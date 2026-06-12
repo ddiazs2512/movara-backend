@@ -566,7 +566,8 @@ def viaje_activo(
             "asignado",
             "en_camino",
             "llegado",
-            "en_curso"
+            "en_curso",
+            "finalizado"
         ])
     ).order_by(
         Viaje.id.desc()
