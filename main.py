@@ -1,16 +1,11 @@
 import os
 import logging
-from fastapi import FastAPI
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import Base, engine
 from routers import usuarios, viajes, ofertas, chat, evaluaciones
-from routers import websocket
-
-from routers import mercado_ws
-from routers import conductor_ws
 
 import firebase_admin
 from firebase_admin import credentials
@@ -61,16 +56,7 @@ app.include_router(viajes.router)
 app.include_router(ofertas.router)
 app.include_router(chat.router)
 app.include_router(evaluaciones.router)
-app.include_router(
-    websocket.router
-)
-app.include_router(
-    mercado_ws.router
-)
 
-app.include_router(
-    conductor_ws.router
-)
 
 # ======================
 # TEST
