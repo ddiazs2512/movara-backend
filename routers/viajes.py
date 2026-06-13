@@ -674,7 +674,25 @@ def viaje_activo(
                 "id": str(o.id),
                 "conductor_id": o.conductor_id,
                 "precio": o.precio,
-                "conductor_nombre": None,
+        
+                "conductor_nombre":
+                    db.query(Usuario)
+                    .filter(Usuario.id == o.conductor_id)
+                    .first().nombre
+                    if o.conductor_id else None,
+        
+                "rating":
+                    db.query(Usuario)
+                    .filter(Usuario.id == o.conductor_id)
+                    .first().rating
+                    if o.conductor_id else 0,
+        
+                "total_viajes":
+                    db.query(Usuario)
+                    .filter(Usuario.id == o.conductor_id)
+                    .first().total_viajes
+                    if o.conductor_id else 0,
+        
                 "timestamp":
                     int(o.fecha_creacion.timestamp() * 1000)
                     if o.fecha_creacion else 0
