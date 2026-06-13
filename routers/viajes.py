@@ -521,6 +521,25 @@ def viajes_disponibles(
         if distancia > 4000:
             continue
 
+        cliente_rating = 0
+        cliente_total = 0
+        
+        if v.cliente:
+        
+            evaluaciones_cliente = db.query(Evaluacion).filter(
+                Evaluacion.evaluado_id == v.cliente.id
+            ).all()
+        
+            if evaluaciones_cliente:
+        
+                cliente_total = len(evaluaciones_cliente)
+        
+                cliente_rating = round(
+                    sum(e.estrellas for e in evaluaciones_cliente)
+                    / cliente_total,
+                    1
+                )
+        
         resultado.append({
             "id": v.id,
             "referencia_recojo": v.referencia_recojo,
@@ -531,23 +550,31 @@ def viajes_disponibles(
             "estado": v.estado,
             "conductor_id": None,
             "cliente_id": v.cliente_id,
+        
             "lat_origen": v.lat_origen,
             "lng_origen": v.lng_origen,
             "lat_destino": v.lat_destino,
             "lng_destino": v.lng_destino,
+        
             "ultimo_en_ofertar": None,
-
+        
             "distancia_conductor_m": distancia,
-
+        
+            "cliente_nombre":
+                v.cliente.nombre if v.cliente else None,
+        
+            "cliente_rating":
+                cliente_rating,
+        
+            "cliente_total_viajes":
+                cliente_total,
+        
             "ruta": {
                 "distancia_texto": ruta["distancia_texto"] if ruta else None,
                 "duracion_texto": ruta["duracion_texto"] if ruta else None,
                 "polyline": ruta["polyline"] if ruta else None
-            } if ruta else None,
-
-            "cliente_nombre": v.cliente.nombre if v.cliente else None
+            } if ruta else None
         })
-
     return resultado
     
 @router.get("/viaje_activo", response_model=ViajeActivoResponse)
