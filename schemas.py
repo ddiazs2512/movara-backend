@@ -143,21 +143,19 @@ class ViajeActivoResponse(BaseModel):
     lat_conductor: Optional[float]
     lng_conductor: Optional[float]
 
+    referencia_recojo: Optional[str]
     destino_referencia: Optional[str]
 
     cliente_id: Optional[int]
     cliente_nombre: Optional[str]
+    cliente_telefono: Optional[str]
 
     conductor_id: Optional[int]
     conductor_nombre: Optional[str]
-
     conductor_telefono: Optional[str]
-    cliente_telefono: Optional[str]
-    
-    referencia_recojo: Optional[str]
-    destino_referencia: Optional[str]
 
     precio_acordado: Optional[float]
+
     ofertas: list = []
 
     marca: Optional[str]
