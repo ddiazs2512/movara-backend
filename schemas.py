@@ -151,6 +151,12 @@ class ViajeActivoResponse(BaseModel):
     conductor_id: Optional[int]
     conductor_nombre: Optional[str]
 
+    conductor_telefono: Optional[str]
+    cliente_telefono: Optional[str]
+    
+    referencia_recojo: Optional[str]
+    destino_referencia: Optional[str]
+
     precio_acordado: Optional[float]
     ofertas: list = []
 
