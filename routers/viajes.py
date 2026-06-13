@@ -769,20 +769,28 @@ def viajes_pendientes(
         resultado.append({
             "id": v.id,
             "estado": v.estado,
-
+        
             "referencia_recojo": v.referencia_recojo,
             "destino_referencia": v.destino_referencia,
-
+        
             "lat_origen": v.lat_origen,
             "lng_origen": v.lng_origen,
             "lat_destino": v.lat_destino,
             "lng_destino": v.lng_destino,
-
+        
             "precio_cliente": v.precio_cliente_1,
-            "cliente_nombre": cliente.nombre if cliente else "Cliente",
-
+        
+            "cliente_nombre":
+                cliente.nombre if cliente else "Cliente",
+        
+            "cliente_rating":
+                cliente.rating if cliente else 0,
+        
+            "cliente_total_viajes":
+                cliente.total_viajes if cliente else 0,
+        
             "distancia_conductor_m": distancia_conductor,
-
+        
             "ruta": {
                 "distancia_texto": ruta["distancia_texto"] if ruta else None,
                 "duracion_texto": ruta["duracion_texto"] if ruta else None,
