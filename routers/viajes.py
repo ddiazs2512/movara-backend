@@ -669,6 +669,20 @@ def viaje_activo(
 
         precio_acordado=viaje.precio_acordado,
 
+        conductor_telefono=
+            conductor_usuario.telefono
+            if conductor_usuario else None,
+        
+        cliente_telefono=
+            cliente.telefono
+            if cliente else None,
+        
+        referencia_recojo=
+            viaje.referencia_recojo,
+        
+        destino_referencia=
+            viaje.destino_referencia,
+
         ofertas=[
             {
                 "id": str(o.id),
