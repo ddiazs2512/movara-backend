@@ -766,6 +766,25 @@ def viajes_pendientes(
             v.lng_destino
         )
 
+        cliente_rating = 0
+        cliente_total = 0
+        
+        if cliente:
+        
+            evaluaciones_cliente = db.query(Evaluacion).filter(
+                Evaluacion.evaluado_id == cliente.id
+            ).all()
+        
+            if evaluaciones_cliente:
+        
+                cliente_total = len(evaluaciones_cliente)
+        
+                cliente_rating = round(
+                    sum(e.estrellas for e in evaluaciones_cliente)
+                    / cliente_total,
+                    1
+                )
+
         resultado.append({
             "id": v.id,
             "estado": v.estado,
@@ -779,16 +798,11 @@ def viajes_pendientes(
             "lng_destino": v.lng_destino,
         
             "precio_cliente": v.precio_cliente_1,
-        
-            "cliente_nombre":
-                cliente.nombre if cliente else "Cliente",
-        
-            "cliente_rating":
-                cliente.rating if cliente else 0,
-        
-            "cliente_total_viajes":
-                cliente.total_viajes if cliente else 0,
-        
+
+            "cliente_nombre": cliente.nombre if cliente else "Cliente",
+            "cliente_rating": cliente_rating,
+            "cliente_total_viajes": cliente_total,
+            
             "distancia_conductor_m": distancia_conductor,
         
             "ruta": {
