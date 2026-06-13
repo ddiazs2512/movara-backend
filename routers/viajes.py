@@ -604,11 +604,14 @@ def viaje_activo(
             lng_destino=None,
             lat_conductor=None,
             lng_conductor=None,
+            referencia_recojo=None,
             destino_referencia=None,
             cliente_id=None,
             cliente_nombre=None,
+            cliente_telefono=None,
             conductor_id=None,
             conductor_nombre=None,
+            conductor_telefono=None,
             precio_acordado=None,
             marca=None,
             modelo=None,
@@ -650,38 +653,21 @@ def viaje_activo(
         lat_destino=viaje.lat_destino,
         lng_destino=viaje.lng_destino,
 
-        lat_conductor=
-            ubicacion.lat if ubicacion else None,
+        lat_conductor=ubicacion.lat if ubicacion else None,
+        lng_conductor=ubicacion.lng if ubicacion else None,
 
-        lng_conductor=
-            ubicacion.lng if ubicacion else None,
-
+        referencia_recojo=viaje.referencia_recojo,
         destino_referencia=viaje.destino_referencia,
 
         cliente_id=viaje.cliente_id,
-        cliente_nombre=
-            cliente.nombre if cliente else None,
+        cliente_nombre=cliente.nombre if cliente else None,
+        cliente_telefono=cliente.telefono if cliente else None,
 
         conductor_id=viaje.conductor_id,
-        conductor_nombre=
-            conductor_usuario.nombre
-            if conductor_usuario else None,
+        conductor_nombre=conductor_usuario.nombre if conductor_usuario else None,
+        conductor_telefono=conductor_usuario.telefono if conductor_usuario else None,
 
         precio_acordado=viaje.precio_acordado,
-
-        conductor_telefono=
-            conductor_usuario.telefono
-            if conductor_usuario else None,
-        
-        cliente_telefono=
-            cliente.telefono
-            if cliente else None,
-        
-        referencia_recojo=
-            viaje.referencia_recojo,
-        
-        destino_referencia=
-            viaje.destino_referencia,
 
         ofertas=[
             {
@@ -698,8 +684,7 @@ def viaje_activo(
 
         marca=conductor.marca if conductor else None,
         modelo=conductor.modelo if conductor else None,
-        color_vehiculo=
-            conductor.color_vehiculo if conductor else None,
+        color_vehiculo=conductor.color_vehiculo if conductor else None,
         placa=conductor.placa if conductor else None
     )
 
