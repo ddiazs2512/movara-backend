@@ -594,6 +594,7 @@ def viaje_activo(
             "en_camino",
             "llegado",
             "en_curso",
+            "cancelado",
             "finalizado"
         ])
     ).order_by(
