@@ -127,6 +127,18 @@ def login(usuario: UsuarioLogin, db: Session = Depends(get_db)):
     }
 
 # ======================
+# VERSION APP
+# ======================
+
+@router.get("/version")
+def obtener_version():
+
+    return {
+        "version_minima": 2,
+        "forzar": True
+    }
+
+# ======================
 # OBTENER USUARIO
 # ======================
 
