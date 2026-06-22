@@ -1041,20 +1041,64 @@ def historial_cliente(
     db: Session = Depends(get_db)
 ):
 
-    return db.query(Viaje).filter(
+    viajes = db.query(Viaje).filter(
         Viaje.cliente_id == current_user.id,
         Viaje.estado == "finalizado"
+    ).order_by(
+        Viaje.fecha_creacion.desc()
     ).all()
+
+    return [
+        {
+            "id": v.id,
+            "origen": v.referencia_recojo,
+            "destino": v.destino_referencia,
+            "precio": (
+                v.precio_acordado
+                or v.precio_cliente_2
+                or v.precio_cliente_1
+            ),
+            "fecha": (
+                v.fecha_fin.isoformat()
+                if v.fecha_fin
+                else v.fecha_creacion.isoformat()
+            )
+        }
+        for v in viajes
+    ]
+
 
 @router.get("/historial/conductor")
 def historial_conductor(
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    return db.query(Viaje).filter(
+
+    viajes = db.query(Viaje).filter(
         Viaje.conductor_id == current_user.id,
         Viaje.estado == "finalizado"
+    ).order_by(
+        Viaje.fecha_creacion.desc()
     ).all()
+
+    return [
+        {
+            "id": v.id,
+            "origen": v.referencia_recojo,
+            "destino": v.destino_referencia,
+            "precio": (
+                v.precio_acordado
+                or v.precio_conductor
+                or v.precio_cliente_1
+            ),
+            "fecha": (
+                v.fecha_fin.isoformat()
+                if v.fecha_fin
+                else v.fecha_creacion.isoformat()
+            )
+        }
+        for v in viajes
+    ]
 
 @router.get("/ubicacion_conductor/{viaje_id}")
 def obtener_ubicacion_conductor(
