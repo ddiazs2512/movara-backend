@@ -1062,7 +1062,8 @@ def historial_cliente(
                 v.fecha_fin.isoformat()
                 if v.fecha_fin
                 else v.fecha_creacion.isoformat()
-            )
+            ),
+            "estado": v.estado
         }
         for v in viajes
     ]
@@ -1095,7 +1096,8 @@ def historial_conductor(
                 v.fecha_fin.isoformat()
                 if v.fecha_fin
                 else v.fecha_creacion.isoformat()
-            )
+            ),
+            "estado": v.estado
         }
         for v in viajes
     ]
