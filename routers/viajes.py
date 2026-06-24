@@ -1287,3 +1287,21 @@ def actualizar_ubicacion_disponible(
     db.commit()
 
     return {"ok": True}
+
+@router.delete("/conductor/ubicacion_disponible")
+def eliminar_ubicacion_disponible(
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+
+    if current_user.rol != "conductor":
+        raise HTTPException(403, "Solo conductores")
+
+    db.query(Ubicacion).filter(
+        Ubicacion.conductor_id == current_user.id,
+        Ubicacion.viaje_id == None
+    ).delete()
+
+    db.commit()
+
+    return {"ok": True}
