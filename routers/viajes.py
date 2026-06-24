@@ -16,6 +16,8 @@ from models import puede_transicionar
 from routers.usuarios import get_current_user
 from schemas import ViajeActivoResponse
 from fastapi import Request
+from websocket.manager import manager
+import asyncio
 
 def actualizar_estado_viaje(db, viaje, nuevo_estado):
     if not puede_transicionar(viaje.estado, nuevo_estado):
@@ -256,6 +258,11 @@ def crear_viaje(
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
+
+    print(f"WS -> Notificando mercado. Viaje {nuevo.id}")
+    asyncio.create_task(
+        manager.notify_mercado()
+    )
     
     # ======================
     # CONDUCTORES DISPONIBLES
