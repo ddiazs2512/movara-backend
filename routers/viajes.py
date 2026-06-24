@@ -258,11 +258,6 @@ def crear_viaje(
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
-
-    print(f"WS -> Notificando mercado. Viaje {nuevo.id}")
-    asyncio.create_task(
-        manager.notify_mercado()
-    )
     
     # ======================
     # CONDUCTORES DISPONIBLES
