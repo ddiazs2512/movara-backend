@@ -10,6 +10,9 @@ from routers import usuarios, viajes, ofertas, chat, evaluaciones
 import firebase_admin
 from firebase_admin import credentials
 
+from websocket.mercado_ws import router as mercado_router
+from websocket.mis_viajes_ws import router as mis_viajes_router
+
 # ======================
 # CONFIG INICIAL
 # ======================
@@ -56,6 +59,8 @@ app.include_router(viajes.router)
 app.include_router(ofertas.router)
 app.include_router(chat.router)
 app.include_router(evaluaciones.router)
+app.include_router(mercado_router)
+app.include_router(mis_viajes_router)
 
 
 # ======================
