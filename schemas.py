@@ -128,6 +128,12 @@ class ViajeResponse(BaseModel):
     color_vehiculo: Optional[str]
     placa: Optional[str]
     
+class RutaResponse(BaseModel):
+    distancia_texto: Optional[str]
+    duracion_texto: Optional[str]
+    polyline: Optional[str]
+
+
 class ViajeActivoResponse(BaseModel):
     activo: bool
 
@@ -153,6 +159,12 @@ class ViajeActivoResponse(BaseModel):
     conductor_id: Optional[int]
     conductor_nombre: Optional[str]
     conductor_telefono: Optional[str]
+
+    # NUEVOS
+    precio_cliente: Optional[float]
+    cliente_rating: Optional[float]
+    cliente_total_viajes: Optional[int]
+    ruta: Optional[RutaResponse]
 
     precio_acordado: Optional[float]
 
