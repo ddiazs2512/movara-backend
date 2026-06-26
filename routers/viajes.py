@@ -650,6 +650,32 @@ def viaje_activo(
     cliente = viaje.cliente
     conductor_usuario = viaje.conductor
 
+    ruta = obtener_ruta_google(
+        viaje.lat_origen,
+        viaje.lng_origen,
+        viaje.lat_destino,
+        viaje.lng_destino
+    )
+
+    cliente_rating = 0
+    cliente_total = 0
+
+    if cliente:
+
+        evaluaciones_cliente = db.query(Evaluacion).filter(
+            Evaluacion.evaluado_id == cliente.id
+        ).all()
+
+        if evaluaciones_cliente:
+
+            cliente_total = len(evaluaciones_cliente)
+
+            cliente_rating = round(
+                sum(e.estrellas for e in evaluaciones_cliente)
+                / cliente_total,
+                1
+            )
+
     ofertas = db.query(Oferta).filter(
         Oferta.viaje_id == viaje.id,
         Oferta.estado == "activa"
@@ -690,6 +716,18 @@ def viaje_activo(
         cliente_id=viaje.cliente_id,
         cliente_nombre=cliente.nombre if cliente else None,
         cliente_telefono=cliente.telefono if cliente else None,
+
+        precio_cliente=viaje.precio_cliente_1,
+
+        cliente_rating=cliente_rating,
+
+        cliente_total_viajes=cliente_total,
+
+        ruta=RutaResponse(
+            distancia_texto=ruta["distancia_texto"],
+            duracion_texto=ruta["duracion_texto"],
+            polyline=ruta["polyline"]
+        ) if ruta else None,
 
         conductor_id=viaje.conductor_id,
         conductor_nombre=conductor_usuario.nombre if conductor_usuario else None,
