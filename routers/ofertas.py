@@ -159,8 +159,8 @@ async def responder_oferta(
     # ======================
     elif data.accion == "aceptar":
 
-        if current_user.rol != "cliente":
-            raise HTTPException(403, "Solo clientes pueden aceptar")
+        if current_user.modo_actual != "cliente":
+            raise HTTPException(403, "Debes estar en modo cliente")
     
         if viaje.cliente_id != current_user.id:
             raise HTTPException(403, "No eres el cliente")
