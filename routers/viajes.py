@@ -796,13 +796,6 @@ def viajes_pendientes(
         if distancia_conductor > 4000:
             continue
 
-        ruta = obtener_ruta_google(
-            v.lat_origen,
-            v.lng_origen,
-            v.lat_destino,
-            v.lng_destino
-        )
-
         cliente_rating = 0
         cliente_total = 0
         
@@ -843,10 +836,10 @@ def viajes_pendientes(
             "distancia_conductor_m": distancia_conductor,
         
             "ruta": {
-                "distancia_texto": ruta["distancia_texto"] if ruta else None,
-                "duracion_texto": ruta["duracion_texto"] if ruta else None,
-                "polyline": ruta["polyline"] if ruta else None
-            } if ruta else None
+                "distancia_texto": v.ruta_distancia_texto,
+                "duracion_texto": v.ruta_duracion_texto,
+                "polyline": v.ruta_polyline
+            } if v.ruta_polyline else None
         })
 
     return resultado
