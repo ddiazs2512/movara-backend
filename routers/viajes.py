@@ -6,7 +6,9 @@ from typing import List, Optional
 from datetime import datetime
 import random  # 🔥 IMPORT NECESARIO
 from models import Viaje, Usuario, Conductor, Oferta, Evaluacion, Mensaje, FCMToken, Ubicacion
-from services.route_service import obtener_ruta
+from services.route_service import (
+    obtener_ruta as obtener_ruta_service
+)
 from database import get_db
 from firebase_service import enviar_notificacion_data
 import math
@@ -1155,7 +1157,7 @@ def get_mis_viajes_cliente(
     ]
 
 @router.get("/ruta")
-def obtener_ruta(
+def obtener_ruta_endpoint(
     lat1: float,
     lng1: float,
     lat2: float,
@@ -1163,7 +1165,12 @@ def obtener_ruta(
     current_user: Usuario = Depends(get_current_user)
 ):
 
-    ruta = obtener_ruta_google(lat1, lng1, lat2, lng2)
+    ruta = obtener_ruta_service(
+        lat1,
+        lng1,
+        lat2,
+        lng2
+    )
 
     if not ruta:
         return {"error": "No se pudo calcular ruta"}
