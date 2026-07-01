@@ -14,7 +14,6 @@ from firebase_service import enviar_notificacion_data
 import math
 from schemas import ResponderOfertaRequest, ViajeResponse
 import time
-import requests
 from models import puede_transicionar
 from routers.usuarios import get_current_user
 from schemas import ViajeActivoResponse
