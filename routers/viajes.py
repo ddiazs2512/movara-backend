@@ -527,13 +527,6 @@ def viajes_disponibles(
             v.lng_origen
         )
 
-        ruta = obtener_ruta_google(
-            v.lat_origen,
-            v.lng_origen,
-            v.lat_destino,
-            v.lng_destino
-        )
-
         if distancia > 4000:
             continue
 
@@ -586,10 +579,10 @@ def viajes_disponibles(
                 cliente_total,
         
             "ruta": {
-                "distancia_texto": ruta["distancia_texto"] if ruta else None,
-                "duracion_texto": ruta["duracion_texto"] if ruta else None,
-                "polyline": ruta["polyline"] if ruta else None
-            } if ruta else None
+                "distancia_texto": v.ruta_distancia_texto,
+                "duracion_texto": v.ruta_duracion_texto,
+                "polyline": v.ruta_polyline
+            } if v.ruta_polyline else None
         })
     return resultado
     
