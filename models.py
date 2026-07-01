@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, F
 from datetime import datetime
 from database import Base
 from sqlalchemy.orm import relationship
+from sqlalchemy import Text
 from enum import Enum
 
 # ======================
@@ -107,6 +108,9 @@ class Viaje(Base):
     lng_origen = Column(Float, nullable=False)
     lat_destino = Column(Float, nullable=False)
     lng_destino = Column(Float, nullable=False)
+    ruta_polyline = Column(Text)
+    ruta_distancia_texto = Column(String(50))
+    ruta_duracion_texto = Column(String(50))
     lat_conductor = Column(Float, nullable=True)
     lng_conductor = Column(Float, nullable=True) 
 
