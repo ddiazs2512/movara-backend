@@ -253,6 +253,22 @@ def crear_viaje(
         ciudad=ciudad
     )
 
+    # ======================
+    # CALCULAR RUTA UNA SOLA VEZ
+    # ======================
+    
+    ruta = obtener_ruta_google(
+        viaje.lat_origen,
+        viaje.lng_origen,
+        viaje.lat_destino,
+        viaje.lng_destino
+    )
+    
+    if ruta:
+        nuevo.ruta_polyline = ruta["polyline"]
+        nuevo.ruta_distancia_texto = ruta["distancia_texto"]
+        nuevo.ruta_duracion_texto = ruta["duracion_texto"]
+
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
