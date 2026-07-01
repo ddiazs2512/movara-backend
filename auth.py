@@ -9,7 +9,7 @@ if not SECRET_KEY:
     raise Exception("SECRET_KEY no definida")
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1440
+ACCESS_TOKEN_EXPIRE_MINUTES = 43200
 
 def create_access_token(data: dict):
     to_encode = data.copy()
