@@ -6,6 +6,7 @@ from typing import List, Optional
 from datetime import datetime
 import random  # 🔥 IMPORT NECESARIO
 from models import Viaje, Usuario, Conductor, Oferta, Evaluacion, Mensaje, FCMToken, Ubicacion
+from services.route_service import obtener_ruta
 from database import get_db
 from firebase_service import enviar_notificacion_data
 import math
@@ -257,7 +258,7 @@ def crear_viaje(
     # CALCULAR RUTA UNA SOLA VEZ
     # ======================
     
-    ruta = obtener_ruta_google(
+    ruta = obtener_ruta(
         viaje.lat_origen,
         viaje.lng_origen,
         viaje.lat_destino,
