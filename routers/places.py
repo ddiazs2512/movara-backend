@@ -20,6 +20,4 @@ def detalle(
     place_id: str
 ):
 
-    return {
-        "place_id": place_id
-    }
+    return places_service.detalle(place_id)
