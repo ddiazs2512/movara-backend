@@ -17,7 +17,11 @@ def buscar(
 
 @router.get("/detail")
 def detalle(
-    place_id: str
+    place_id: str,
+    session_id: str
 ):
 
-    return places_service.detalle(place_id)
+    return places_service.detalle(
+        place_id,
+        session_id
+    )
