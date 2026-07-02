@@ -19,10 +19,17 @@ class PlacesService:
             "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY
         }
 
+        session_id = session_token_service.crear()
+
+        session_token = session_token_service.obtener_session_token(
+            session_id
+        )
+        
         body = {
             "input": query,
             "languageCode": "es",
-            "regionCode": "PE"
+            "regionCode": "PE",
+            "sessionToken": session_token
         }
 
         response = requests.post(
