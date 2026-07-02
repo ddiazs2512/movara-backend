@@ -67,17 +67,29 @@ class PlacesService:
 
             })
 
-        session_id = session_token_service.crear()
-
         return {
             "success": True,
             "session_id": session_id,
             "items": resultados
         }
 
-    def detalle(self, place_id: str):
+    def detalle(
+        self,
+        place_id: str,
+        session_id: str
+    ):
 
-        url = f"https://places.googleapis.com/v1/places/{place_id}"
+        session_token = session_token_service.obtener_session_token(
+            session_id
+        )
+        
+        if not session_token:
+            raise Exception("Sesión no encontrada")
+
+        url = (
+            f"https://places.googleapis.com/v1/places/{place_id}"
+            f"?sessionToken={session_token}"
+        )
     
         headers = {
             "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY,
@@ -94,6 +106,8 @@ class PlacesService:
         response.raise_for_status()
     
         data = response.json()
+
+        session_token_service.eliminar(session_id)
     
         return {
     
