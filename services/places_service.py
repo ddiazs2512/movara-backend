@@ -110,22 +110,28 @@ class PlacesService:
         session_token_service.eliminar(session_id)
     
         return {
-    
-            "id":
-                data.get("id"),
-    
-            "name":
-                data.get("displayName", {}).get("text"),
-    
-            "address":
-                data.get("formattedAddress"),
-    
-            "lat":
-                data.get("location", {}).get("latitude"),
-    
-            "lng":
-                data.get("location", {}).get("longitude")
-        }
 
+            "success": True,
+        
+            "data": {
+        
+                "id":
+                    data.get("id"),
+        
+                "name":
+                    data.get("displayName", {}).get("text"),
+        
+                "address":
+                    data.get("formattedAddress"),
+        
+                "lat":
+                    data.get("location", {}).get("latitude"),
+        
+                "lng":
+                    data.get("location", {}).get("longitude")
+        
+            }
+        
+        }
 
 places_service = PlacesService()
