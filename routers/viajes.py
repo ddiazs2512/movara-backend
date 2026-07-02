@@ -628,6 +628,52 @@ def viaje_activo(
     cliente = viaje.cliente
     conductor_usuario = viaje.conductor
 
+    # ======================
+    # RATING CLIENTE
+    # ======================
+    
+    cliente_rating = 0
+    cliente_total = 0
+    
+    if cliente:
+    
+        evaluaciones = db.query(Evaluacion).filter(
+            Evaluacion.evaluado_id == cliente.id
+        ).all()
+    
+        if evaluaciones:
+    
+            cliente_total = len(evaluaciones)
+    
+            cliente_rating = round(
+                sum(e.estrellas for e in evaluaciones) /
+                cliente_total,
+                1
+            )
+    
+    # ======================
+    # RATING CONDUCTOR
+    # ======================
+    
+    conductor_rating = 0
+    conductor_total = 0
+    
+    if conductor_usuario:
+    
+        evaluaciones = db.query(Evaluacion).filter(
+            Evaluacion.evaluado_id == conductor_usuario.id
+        ).all()
+    
+        if evaluaciones:
+    
+            conductor_total = len(evaluaciones)
+    
+            conductor_rating = round(
+                sum(e.estrellas for e in evaluaciones) /
+                conductor_total,
+                1
+            )
+
     ofertas = db.query(Oferta).filter(
         Oferta.viaje_id == viaje.id,
         Oferta.estado == "activa"
