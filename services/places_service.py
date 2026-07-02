@@ -62,7 +62,42 @@ class PlacesService:
         return resultados
 
     def detalle(self, place_id: str):
-        raise NotImplementedError()
+
+        url = f"https://places.googleapis.com/v1/places/{place_id}"
+    
+        headers = {
+            "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY,
+            "X-Goog-FieldMask":
+                "id,displayName,formattedAddress,location"
+        }
+    
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=10
+        )
+    
+        response.raise_for_status()
+    
+        data = response.json()
+    
+        return {
+    
+            "id":
+                data.get("id"),
+    
+            "name":
+                data.get("displayName", {}).get("text"),
+    
+            "address":
+                data.get("formattedAddress"),
+    
+            "lat":
+                data.get("location", {}).get("latitude"),
+    
+            "lng":
+                data.get("location", {}).get("longitude")
+        }
 
 
 places_service = PlacesService()
