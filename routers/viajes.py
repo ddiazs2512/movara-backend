@@ -715,11 +715,23 @@ def viaje_activo(
         cliente_nombre=cliente.nombre if cliente else None,
         cliente_telefono=cliente.telefono if cliente else None,
 
+        cliente_rating=cliente_rating,
+        cliente_total_viajes=cliente_total,
+
         conductor_id=viaje.conductor_id,
         conductor_nombre=conductor_usuario.nombre if conductor_usuario else None,
         conductor_telefono=conductor_usuario.telefono if conductor_usuario else None,
 
+        conductor_rating=conductor_rating,
+        conductor_total_viajes=conductor_total,
+
         precio_acordado=viaje.precio_acordado,
+
+        ruta={
+            "distancia_texto": viaje.ruta_distancia_texto,
+            "duracion_texto": viaje.ruta_duracion_texto,
+            "polyline": viaje.ruta_polyline
+        } if viaje.ruta_polyline else None,
 
         ofertas=[
             {
