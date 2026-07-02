@@ -1,5 +1,6 @@
 import os
 import requests
+from services.session_token_service import session_token_service
 
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
@@ -59,7 +60,13 @@ class PlacesService:
 
             })
 
-        return resultados
+        session_id = session_token_service.crear()
+
+        return {
+            "success": True,
+            "session_id": session_id,
+            "items": resultados
+        }
 
     def detalle(self, place_id: str):
 
