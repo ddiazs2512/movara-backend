@@ -10,7 +10,11 @@ if not GOOGLE_PLACES_API_KEY:
 
 class PlacesService:
 
-    def buscar(self, query: str):
+    def buscar(
+        self,
+        query: str,
+        session_id: str
+    ):
 
         url = "https://places.googleapis.com/v1/places:autocomplete"
 
@@ -19,11 +23,12 @@ class PlacesService:
             "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY
         }
 
-        session_id = session_token_service.crear()
-
         session_token = session_token_service.obtener_session_token(
             session_id
         )
+        
+        if not session_token:
+            raise Exception("Sesión no encontrada")
         
         body = {
             "input": query,
@@ -69,8 +74,16 @@ class PlacesService:
 
         return {
             "success": True,
-            "session_id": session_id,
             "items": resultados
+        }
+
+    def crear_sesion(self):
+
+        session_id = session_token_service.crear()
+    
+        return {
+            "success": True,
+            "session_id": session_id
         }
 
     def detalle(
