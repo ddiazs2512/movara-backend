@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from services.places_service import places_service
 
 router = APIRouter(
     prefix="/places",
@@ -11,10 +11,7 @@ def buscar(
     q: str
 ):
 
-    return {
-        "query": q,
-        "items": []
-    }
+    return places_service.buscar(q)
 
 
 @router.get("/detail")
