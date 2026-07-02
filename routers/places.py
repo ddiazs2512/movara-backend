@@ -1,3 +1,4 @@
+from fastapi import APIRouter
 from services.places_service import places_service
 
 router = APIRouter(
