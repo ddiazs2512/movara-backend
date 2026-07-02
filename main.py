@@ -13,6 +13,8 @@ from firebase_admin import credentials
 from websocket.mercado_ws import router as mercado_router
 from websocket.mis_viajes_ws import router as mis_viajes_router
 
+from routers import places
+
 # ======================
 # CONFIG INICIAL
 # ======================
@@ -61,6 +63,7 @@ app.include_router(chat.router)
 app.include_router(evaluaciones.router)
 app.include_router(mercado_router)
 app.include_router(mis_viajes_router)
+app.include_router(places.router)
 
 
 # ======================
