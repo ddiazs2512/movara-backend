@@ -10,23 +10,22 @@ class SessionTokenService:
     def crear(self):
 
         session_id = str(uuid.uuid4())
-        google_token = str(uuid.uuid4())
 
         self._sessions[session_id] = {
-            "google_token": google_token,
+            "session_token": session_id,
             "created_at": datetime.utcnow()
         }
 
         return session_id
 
-    def obtener_google_token(self, session_id: str):
+    def obtener_session_token(self, session_id: str):
 
         session = self._sessions.get(session_id)
 
         if not session:
             return None
 
-        return session["google_token"]
+        return session["session_token"]
 
     def eliminar(self, session_id: str):
 
