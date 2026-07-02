@@ -54,17 +54,17 @@ class PlacesService:
 
             resultados.append({
 
-                "place_id":
+                "id":
                     place.get("placeId"),
-
-                "titulo":
+            
+                "name":
                     place.get("text", {}).get("text", ""),
-
-                "direccion":
+            
+                "address":
                     place.get("structuredFormat", {})
                         .get("secondaryText", {})
                         .get("text", "")
-
+            
             })
 
         return {
