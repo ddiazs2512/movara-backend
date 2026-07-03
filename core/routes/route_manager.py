@@ -44,7 +44,20 @@ class RouteManager:
             f"tipo={route_type}"
         )
 
-        raise NotImplementedError()
+        ruta = provider_engine.get_directions().directions(
+            origin_lat=origin_lat,
+            origin_lng=origin_lng,
+            destination_lat=destination_lat,
+            destination_lng=destination_lng
+        )
+        
+        route_cache.save(
+            viaje_id=viaje_id,
+            route_type=route_type,
+            ruta=ruta
+        )
+        
+        return ruta
 
 
 route_manager = RouteManager()
