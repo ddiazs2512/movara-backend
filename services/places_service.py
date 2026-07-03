@@ -31,9 +31,7 @@ class PlacesService:
         if not session_token:
             raise Exception("Sesión no encontrada")
         
-        provider = provider_engine.get_places()
-
-        resultados = provider.places_search(
+        resultados = provider_engine.places_search(
             query,
             session_token
         )
