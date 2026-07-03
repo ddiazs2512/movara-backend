@@ -3,7 +3,7 @@ import requests
 from services.session_token_service import session_token_service
 from core.providers.ProviderEngine import provider_engine
 #from core.places import query_normalizer
-#from core.places.query_normalizer import query_normalizer
+from core.places.query_normalizer import query_normalizer
 
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
@@ -19,7 +19,7 @@ class PlacesService:
         session_id: str
     ):
 
-        #query = query_normalizer.normalize(query)
+        query = query_normalizer.normalize(query)
 
         url = "https://places.googleapis.com/v1/places:autocomplete"
 
