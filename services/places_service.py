@@ -2,7 +2,7 @@ import os
 import requests
 from services.session_token_service import session_token_service
 from core.providers.ProviderEngine import provider_engine
-from core.places.query_normalizer import query_normalizer
+
 from core.places import (
     query_normalizer,
     location_bias_builder
