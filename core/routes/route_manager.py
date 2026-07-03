@@ -56,6 +56,12 @@ class RouteManager:
             route_type=route_type,
             ruta=ruta
         )
+
+        print(
+            f"[ROUTE CACHE SAVE] "
+            f"viaje={viaje_id} "
+            f"tipo={route_type}"
+        )
         
         return ruta
 
