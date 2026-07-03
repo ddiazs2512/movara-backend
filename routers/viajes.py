@@ -1196,15 +1196,15 @@ def obtener_ruta_endpoint(
 
     if viaje_id is None:
 
-    ruta = obtener_ruta_service(
+        ruta = obtener_ruta_service(
             lat1,
             lng1,
             lat2,
             lng2
         )
-    
+
     else:
-    
+
         ruta = route_manager.get_route(
             viaje_id=viaje_id,
             route_type=route_type,
