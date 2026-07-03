@@ -32,7 +32,8 @@ class GooglePlacesAdapter:
     def places_search(
         self,
         query: str,
-        session_token: str
+        session_token: str,
+        location_bias: dict | None = None
     ):
 
         headers = {
@@ -54,6 +55,10 @@ class GooglePlacesAdapter:
             "sessionToken": session_token
 
         }
+
+        if location_bias:
+        
+            body["locationBias"] = location_bias
 
         response = requests.post(
 
