@@ -70,14 +70,16 @@ class ProviderEngine:
     def places_search(
         self,
         query: str,
-        session_token: str
+        session_token: str,
+        location_bias: dict | None = None
     ):
-
+    
         provider = self.get_places()
-
+    
         return provider.places_search(
-            query,
-            session_token
+            query=query,
+            session_token=session_token,
+            location_bias=location_bias
         )
 
     def place_detail(
