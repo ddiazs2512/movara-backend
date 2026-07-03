@@ -45,8 +45,9 @@ class PlacesService:
             raise Exception("Sesión no encontrada")
         
         resultados = provider_engine.places_search(
-            query,
-            session_token
+            query=query,
+            session_token=session_token,
+            location_bias=location_bias
         )
         return {
             "success": True,
