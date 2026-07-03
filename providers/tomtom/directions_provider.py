@@ -1,5 +1,6 @@
 import os
 import requests
+import polyline
 
 
 def obtener_ruta_tomtom(
@@ -51,23 +52,39 @@ def obtener_ruta_tomtom(
     summary = route["summary"]
 
     distancia_metros = int(summary["lengthInMeters"])
-
     duracion_segundos = int(summary["travelTimeInSeconds"])
-
+    
+    # ======================
+    # CONVERTIR A POLYLINE
+    # ======================
+    
+    points = []
+    
+    for p in route["legs"][0]["points"]:
+    
+        points.append(
+            (
+                p["latitude"],
+                p["longitude"]
+            )
+        )
+    
+    polyline_codificada = polyline.encode(points, precision=5)
+    
     return {
-
+    
         "distancia_texto":
             f"{round(distancia_metros / 1000, 1)} km",
-
+    
         "distancia_metros":
             distancia_metros,
-
+    
         "duracion_texto":
             f"{round(duracion_segundos / 60)} min",
-
+    
         "duracion_segundos":
             duracion_segundos,
-
+    
         "polyline":
-            route["legs"][0]["points"]
+            polyline_codificada
     }
