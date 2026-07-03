@@ -1,11 +1,12 @@
 """
 Registro central de Providers de Movara.
-
-Permite registrar y obtener adaptadores
-sin que los servicios conozcan su implementación.
 """
 
 from __future__ import annotations
+
+from core.providers.adapters.google_places import (
+    google_places_adapter
+)
 
 
 class ProviderRegistry:
@@ -30,6 +31,7 @@ class ProviderRegistry:
         provider = self._providers.get(name)
 
         if provider is None:
+
             raise Exception(
                 f"Provider '{name}' no registrado"
             )
@@ -49,3 +51,13 @@ class ProviderRegistry:
 
 
 provider_registry = ProviderRegistry()
+
+
+# =====================================
+# REGISTRO DE PROVIDERS
+# =====================================
+
+provider_registry.register(
+    "google",
+    google_places_adapter
+)
