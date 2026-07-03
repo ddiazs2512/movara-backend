@@ -34,6 +34,10 @@ def obtener_ruta_mapbox(
         timeout=10
     )
 
+    print("========== MAPBOX URL ==========")
+    print(response.url)
+    print("================================")
+
     data = response.json()
 
     if "routes" not in data:
