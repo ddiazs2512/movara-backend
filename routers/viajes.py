@@ -1186,6 +1186,10 @@ def obtener_ruta_endpoint(
     lng1: float,
     lat2: float,
     lng2: float,
+
+    viaje_id: int | None = None,
+    route_type: str | None = None,
+
     current_user: Usuario = Depends(get_current_user)
 ):
 
