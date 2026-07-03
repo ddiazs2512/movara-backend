@@ -7,6 +7,9 @@ from __future__ import annotations
 from core.providers.adapters.google_places import (
     google_places_adapter
 )
+from core.providers.adapters.mapbox_directions import (
+    mapbox_directions_adapter
+)
 
 
 class ProviderRegistry:
@@ -60,4 +63,8 @@ provider_registry = ProviderRegistry()
 provider_registry.register(
     "google",
     google_places_adapter
+)
+provider_registry.register(
+    "mapbox",
+    mapbox_directions_adapter
 )
