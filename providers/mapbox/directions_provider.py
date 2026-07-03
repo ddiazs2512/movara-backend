@@ -33,22 +33,26 @@ def obtener_ruta_mapbox(
         params=params,
         timeout=10
     )
-
+    
+    print("========== MAPBOX ==========")
+    print("URL:", response.url)
+    print("============================")
+    
+    data = response.json()
+    
+    if "routes" not in data:
+        return None
+    
+    if len(data["routes"]) == 0:
+        return None
+    
+    route = data["routes"][0]
+    
     print("========== RUTA ==========")
     print("Distancia:", route["distance"])
     print("Duración:", route["duration"])
     print("Geometry inicio:", route["geometry"][:80])
     print("==========================")
-
-    data = response.json()
-
-    if "routes" not in data:
-        return None
-
-    if len(data["routes"]) == 0:
-        return None
-
-    route = data["routes"][0]
 
     distancia_metros = int(route["distance"])
     duracion_segundos = int(route["duration"])
