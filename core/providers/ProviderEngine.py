@@ -1,5 +1,5 @@
 """
-Provider Manager de Movara.
+Provider Engine de Movara.
 
 Los servicios nunca deben llamar directamente
 a Google o Mapbox.
@@ -18,7 +18,7 @@ from core.config import (
 )
 
 
-class ProviderManager:
+class ProviderEngine:
 
     def __init__(self):
 
@@ -47,4 +47,4 @@ class ProviderManager:
         return self.fallback_provider
 
 
-provider_manager = ProviderManager()
+provider_engine = ProviderEngine()
