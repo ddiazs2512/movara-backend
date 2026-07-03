@@ -6,6 +6,9 @@ from providers.google.directions_provider import (
 from providers.mapbox.directions_provider import (
     obtener_ruta_mapbox
 )
+from providers.tomtom.directions_provider import (
+    obtener_ruta_tomtom
+)
 
 # Futuro
 # from providers.mapbox.directions_provider import (
@@ -35,6 +38,15 @@ def obtener_ruta(
 
     elif provider == "mapbox":
         return obtener_ruta_mapbox(
+            lat1,
+            lng1,
+            lat2,
+            lng2
+        )
+
+    elif provider == "tomtom":
+
+        return obtener_ruta_tomtom(
             lat1,
             lng1,
             lat2,
