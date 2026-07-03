@@ -3,7 +3,7 @@ import requests
 from services.session_token_service import session_token_service
 from core.providers.ProviderEngine import provider_engine
 #from core.places import query_normalizer
-from core.places.query_normalizer import query_normalizer
+#from core.places.query_normalizer import query_normalizer
 
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
