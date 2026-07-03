@@ -10,6 +10,7 @@ from models import Viaje, Oferta, Conductor, Usuario, FCMToken, puede_transicion
 from routers.usuarios import get_current_user
 from firebase_service import enviar_notificacion_data
 from routers.viajes import actualizar_estado_viaje
+from core.routes import route_cache
 
 
 router = APIRouter()
@@ -378,6 +379,12 @@ async def responder_oferta(
         viaje.fecha_fin = datetime.utcnow()
         db.commit()
         db.refresh(viaje)
+
+        route_cache.delete(viaje.id)
+
+        print(
+            f"[ROUTE CACHE CLEAR] viaje={viaje.id}"
+        )
 
         # 🔥 ACTUALIZAR MÉTRICAS
         conductor_user = db.query(Usuario).filter(
