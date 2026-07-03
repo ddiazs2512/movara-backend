@@ -34,9 +34,11 @@ def obtener_ruta_mapbox(
         timeout=10
     )
 
-    print("========== MAPBOX URL ==========")
-    print(response.url)
-    print("================================")
+    print("========== RUTA ==========")
+    print("Distancia:", route["distance"])
+    print("Duración:", route["duration"])
+    print("Geometry inicio:", route["geometry"][:80])
+    print("==========================")
 
     data = response.json()
 
