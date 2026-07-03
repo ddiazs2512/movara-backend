@@ -24,6 +24,12 @@ class PlacesService:
 
         query = query_normalizer.normalize(query)
 
+        location_bias = location_bias_builder.build(
+            lat=-12.0464,
+            lng=-77.0428,
+            radio=30000
+        )
+
         url = "https://places.googleapis.com/v1/places:autocomplete"
 
         headers = {
