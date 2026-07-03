@@ -1,19 +1,19 @@
 import os
+import geohash2
+
+from core.cache import cache_manager
 
 from providers.google.directions_provider import (
     obtener_ruta_google
 )
+
 from providers.mapbox.directions_provider import (
     obtener_ruta_mapbox
 )
+
 from providers.tomtom.directions_provider import (
     obtener_ruta_tomtom
 )
-
-# Futuro
-# from providers.mapbox.directions_provider import (
-#     obtener_ruta_mapbox
-# )
 
 
 def obtener_ruta(
@@ -28,8 +28,35 @@ def obtener_ruta(
         "google"
     ).lower()
 
+    origen = geohash2.encode(
+        lat1,
+        lng1,
+        precision=6
+    )
+
+    destino = geohash2.encode(
+        lat2,
+        lng2,
+        precision=6
+    )
+
+    cache_key = (
+        f"route:{provider}:{origen}:{destino}"
+    )
+
+    ruta = cache_manager.get(cache_key)
+
+    if ruta is not None:
+
+        print(f"[CACHE HIT] {cache_key}")
+
+        return ruta
+
+    print(f"[CACHE MISS] {cache_key}")
+
     if provider == "google":
-        return obtener_ruta_google(
+
+        ruta = obtener_ruta_google(
             lat1,
             lng1,
             lat2,
@@ -37,7 +64,8 @@ def obtener_ruta(
         )
 
     elif provider == "mapbox":
-        return obtener_ruta_mapbox(
+
+        ruta = obtener_ruta_mapbox(
             lat1,
             lng1,
             lat2,
@@ -46,13 +74,26 @@ def obtener_ruta(
 
     elif provider == "tomtom":
 
-        return obtener_ruta_tomtom(
+        ruta = obtener_ruta_tomtom(
             lat1,
             lng1,
             lat2,
             lng2
         )
 
-    raise Exception(
-        f"Proveedor de rutas no soportado: {provider}"
-    )
+    else:
+
+        raise Exception(
+            f"Proveedor de rutas no soportado: {provider}"
+        )
+
+    if ruta:
+
+        cache_manager.set(
+            key=cache_key,
+            value=ruta,
+            ttl=300,
+            provider=provider
+        )
+
+    return ruta
