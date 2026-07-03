@@ -18,6 +18,7 @@ from models import puede_transicionar
 from routers.usuarios import get_current_user
 from schemas import ViajeActivoResponse
 from fastapi import Request
+from core.routes import route_manager
 
 def actualizar_estado_viaje(db, viaje, nuevo_estado):
     if not puede_transicionar(viaje.estado, nuevo_estado):
@@ -1193,12 +1194,25 @@ def obtener_ruta_endpoint(
     current_user: Usuario = Depends(get_current_user)
 ):
 
+    if viaje_id is None:
+
     ruta = obtener_ruta_service(
-        lat1,
-        lng1,
-        lat2,
-        lng2
-    )
+            lat1,
+            lng1,
+            lat2,
+            lng2
+        )
+    
+    else:
+    
+        ruta = route_manager.get_route(
+            viaje_id=viaje_id,
+            route_type=route_type,
+            origin_lat=lat1,
+            origin_lng=lng1,
+            destination_lat=lat2,
+            destination_lng=lng2
+        )
 
     if not ruta:
         return {"error": "No se pudo calcular ruta"}
