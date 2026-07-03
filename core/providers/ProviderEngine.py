@@ -1,11 +1,11 @@
 """
 Provider Engine de Movara.
 
-Los servicios nunca deben llamar directamente
-a Google o Mapbox.
+Responsable de entregar el Provider correcto
+a cada servicio.
 
-Toda integración con proveedores externos
-debe pasar por esta clase.
+Los servicios nunca deben conocer Google,
+Mapbox o cualquier otro proveedor.
 """
 
 from __future__ import annotations
@@ -17,34 +17,36 @@ from core.config import (
     FALLBACK_PROVIDER
 )
 
+from core.providers.registry import (
+    provider_registry
+)
+
 
 class ProviderEngine:
 
-    def __init__(self):
+    def get_places(self):
 
-        self.places_provider = PRIMARY_PLACES_PROVIDER
+        return provider_registry.get(
+            PRIMARY_PLACES_PROVIDER
+        )
 
-        self.reverse_provider = PRIMARY_REVERSE_PROVIDER
+    def get_reverse(self):
 
-        self.directions_provider = PRIMARY_DIRECTIONS_PROVIDER
+        return provider_registry.get(
+            PRIMARY_REVERSE_PROVIDER
+        )
 
-        self.fallback_provider = FALLBACK_PROVIDER
+    def get_directions(self):
 
-    def get_places_provider(self):
+        return provider_registry.get(
+            PRIMARY_DIRECTIONS_PROVIDER
+        )
 
-        return self.places_provider
+    def get_fallback(self):
 
-    def get_reverse_provider(self):
-
-        return self.reverse_provider
-
-    def get_directions_provider(self):
-
-        return self.directions_provider
-
-    def get_fallback_provider(self):
-
-        return self.fallback_provider
+        return provider_registry.get(
+            FALLBACK_PROVIDER
+        )
 
 
 provider_engine = ProviderEngine()
