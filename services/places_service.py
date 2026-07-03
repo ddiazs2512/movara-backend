@@ -1,6 +1,7 @@
 import os
 import requests
 from services.session_token_service import session_token_service
+from core.providers.ProviderEngine import provider_engine
 
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
@@ -30,48 +31,12 @@ class PlacesService:
         if not session_token:
             raise Exception("Sesión no encontrada")
         
-        body = {
-            "input": query,
-            "languageCode": "es",
-            "regionCode": "PE",
-            "sessionToken": session_token
-        }
+        provider = provider_engine.get_places()
 
-        response = requests.post(
-            url,
-            headers=headers,
-            json=body,
-            timeout=10
+        resultados = provider.places_search(
+            query,
+            session_token
         )
-
-        response.raise_for_status()
-
-        data = response.json()
-
-        resultados = []
-
-        for item in data.get("suggestions", []):
-
-            place = item.get("placePrediction")
-
-            if not place:
-                continue
-
-            resultados.append({
-
-                "id":
-                    place.get("placeId"),
-            
-                "name":
-                    place.get("text", {}).get("text", ""),
-            
-                "address":
-                    place.get("structuredFormat", {})
-                        .get("secondaryText", {})
-                        .get("text", "")
-            
-            })
-
         return {
             "success": True,
             "items": resultados
