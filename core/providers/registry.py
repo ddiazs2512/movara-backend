@@ -10,6 +10,9 @@ from core.providers.adapters.google_places import (
 from core.providers.adapters.mapbox_directions import (
     mapbox_directions_adapter
 )
+from core.providers.adapters.tomtom_directions import (
+    tomtom_directions_adapter
+)
 
 
 class ProviderRegistry:
@@ -64,7 +67,14 @@ provider_registry.register(
     "google",
     google_places_adapter
 )
+
 provider_registry.register(
     "mapbox",
+    
     mapbox_directions_adapter
+)
+
+provider_registry.register(
+    "tomtom",
+    tomtom_directions_adapter
 )
