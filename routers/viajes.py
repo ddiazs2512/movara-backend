@@ -9,6 +9,12 @@ from models import Viaje, Usuario, Conductor, Oferta, Evaluacion, Mensaje, FCMTo
 from services.route_service import (
     obtener_ruta as obtener_ruta_service
 )
+from config.viajes import (
+    PRECIO_MINIMO,
+    PRECIO_MAXIMO,
+    DISTANCIA_MINIMA,
+    DISTANCIA_MAXIMA
+)
 from database import get_db
 from firebase_service import enviar_notificacion_data
 import math
@@ -204,6 +210,27 @@ def crear_viaje(
 
     if len(activos) > 0:
         raise HTTPException(400, "Ya tienes un viaje activo")
+
+    if len(activos) > 0:
+        raise HTTPException(400, "Ya tienes un viaje activo")
+    
+    # ======================
+    # VALIDAR PRECIO
+    # ======================
+    
+    if viaje.precio_propuesto < PRECIO_MINIMO:
+    
+        raise HTTPException(
+            400,
+            f"El precio mínimo permitido es S/ {PRECIO_MINIMO:.2f}"
+        )
+    
+    if viaje.precio_propuesto > PRECIO_MAXIMO:
+    
+        raise HTTPException(
+            400,
+            f"El precio máximo permitido es S/ {PRECIO_MAXIMO:.2f}"
+        )
         
 
     # ======================
@@ -235,10 +262,31 @@ def crear_viaje(
     )
     
     if ruta:
+
+        # ======================
+        # VALIDAR DISTANCIA
+        # ======================
+    
+        distancia = ruta["distancia_metros"]
+    
+        if distancia < DISTANCIA_MINIMA:
+    
+            raise HTTPException(
+                400,
+                "El origen y destino están demasiado cerca."
+            )
+    
+        if distancia > DISTANCIA_MAXIMA:
+    
+            raise HTTPException(
+                400,
+                "La distancia máxima permitida es de 18 km."
+            )
+    
         nuevo.ruta_polyline = ruta["polyline"]
         nuevo.ruta_distancia_texto = ruta["distancia_texto"]
         nuevo.ruta_duracion_texto = ruta["duracion_texto"]
-
+    
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
