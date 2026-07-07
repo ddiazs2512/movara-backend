@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import bcrypt
 from fastapi.security import OAuth2PasswordBearer
 import random
+from sqlalchemy import or_
 
 from auth import verify_token, create_access_token
 from models import Usuario, Conductor, FCMToken
@@ -266,15 +267,55 @@ def cambiar_modo(
     usuario = user
 
     if modo not in ["cliente", "conductor"]:
-        raise HTTPException(400, "Modo inválido")
+        raise HTTPException(
+            status_code=400,
+            detail="Modo inválido"
+        )
+
+    # ==========================================
+    # NO PERMITIR CAMBIAR DE MODO CON VIAJE ACTIVO
+    # ==========================================
+
+    viaje_activo = db.query(Viaje).filter(
+
+        or_(
+            Viaje.cliente_id == user.id,
+            Viaje.conductor_id == user.id
+        ),
+
+        Viaje.estado.in_([
+            "oferta",
+            "asignado",
+            "en_camino",
+            "llegado",
+            "en_curso"
+        ])
+
+    ).first()
+
+    if viaje_activo:
+
+        raise HTTPException(
+            status_code=409,
+            detail="Tienes un viaje activo. Debes finalizarlo o cancelarlo antes de cambiar de modo."
+        )
+
+    # ==========================================
+    # VALIDAR REGISTRO COMO CONDUCTOR
+    # ==========================================
 
     if modo == "conductor":
+
         conductor = db.query(Conductor).filter(
             Conductor.usuario_id == user.id
         ).first()
 
         if not conductor:
-            raise HTTPException(403, "Debes registrarte como conductor")
+
+            raise HTTPException(
+                status_code=403,
+                detail="Debes registrarte como conductor"
+            )
 
     usuario.modo_actual = modo
     usuario.activo = True
