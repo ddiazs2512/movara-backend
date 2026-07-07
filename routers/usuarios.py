@@ -7,7 +7,7 @@ import random
 from sqlalchemy import or_
 
 from auth import verify_token, create_access_token
-from models import Usuario, Conductor, FCMToken
+from models import Usuario, Conductor, Viaje, FCMToken
 from database import get_db
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
