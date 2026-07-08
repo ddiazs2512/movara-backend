@@ -246,3 +246,156 @@ class Configuracion(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+
+# ==========================================================
+# TERRITORIO
+# ==========================================================
+
+class CatPais(Base):
+    __tablename__ = "cat_paises"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(100), unique=True, nullable=False)
+    codigo_iso2 = Column(String(2), unique=True, nullable=False)
+    codigo_iso3 = Column(String(3))
+    activo = Column(Boolean, default=True)
+    fecha_creacion = Column(DateTime, server_default=func.now())
+
+
+class CatDepartamento(Base):
+    __tablename__ = "cat_departamentos"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    pais_id = Column(
+        Integer,
+        ForeignKey("cat_paises.id"),
+        nullable=False
+    )
+
+    nombre = Column(String(100), nullable=False)
+    ubigeo = Column(String(2), nullable=False)
+
+    activo = Column(Boolean, default=True)
+
+    fecha_creacion = Column(
+        DateTime,
+        server_default=func.now()
+    )
+
+    pais = relationship("CatPais")
+
+
+class CatProvincia(Base):
+    __tablename__ = "cat_provincias"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    departamento_id = Column(
+        Integer,
+        ForeignKey("cat_departamentos.id"),
+        nullable=False
+    )
+
+    nombre = Column(String(100), nullable=False)
+    ubigeo = Column(String(4), nullable=False)
+
+    activo = Column(Boolean, default=True)
+
+    fecha_creacion = Column(
+        DateTime,
+        server_default=func.now()
+    )
+
+    departamento = relationship("CatDepartamento")
+
+
+class CatDistrito(Base):
+    __tablename__ = "cat_distritos"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    provincia_id = Column(
+        Integer,
+        ForeignKey("cat_provincias.id"),
+        nullable=False
+    )
+
+    nombre = Column(String(100), nullable=False)
+
+    ubigeo = Column(
+        String(6),
+        unique=True,
+        nullable=False
+    )
+
+    activo = Column(Boolean, default=True)
+
+    fecha_creacion = Column(
+        DateTime,
+        server_default=func.now()
+    )
+
+    provincia = relationship("CatProvincia")
+
+
+class AreaOperacion(Base):
+    __tablename__ = "areas_operacion"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    codigo = Column(
+        String(20),
+        unique=True,
+        nullable=False
+    )
+
+    nombre = Column(String(100), nullable=False)
+
+    descripcion = Column(Text)
+
+    estado = Column(Integer, default=0)
+
+    radio_operacion = Column(Integer, default=18000)
+
+    latitud_centro = Column(Float)
+
+    longitud_centro = Column(Float)
+
+    socio_principal_id = Column(Integer)
+
+    activo = Column(Boolean, default=True)
+
+    fecha_creacion = Column(
+        DateTime,
+        server_default=func.now()
+    )
+
+
+class AreaOperacionDistrito(Base):
+    __tablename__ = "area_operacion_distritos"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    area_operacion_id = Column(
+        Integer,
+        ForeignKey("areas_operacion.id"),
+        nullable=False
+    )
+
+    distrito_id = Column(
+        Integer,
+        ForeignKey("cat_distritos.id"),
+        nullable=False
+    )
+
+    fecha_asignacion = Column(
+        DateTime,
+        server_default=func.now()
+    )
+
+    activo = Column(Boolean, default=True)
+
+    area_operacion = relationship("AreaOperacion")
+
+    distrito = relationship("CatDistrito")
