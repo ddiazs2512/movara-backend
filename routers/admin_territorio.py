@@ -119,3 +119,9 @@ def asignar_distrito(
 
         request.distrito_id
     )
+
+@router.post("/importar-ubigeo")
+def importar_ubigeo(
+    db: Session = Depends(get_db)
+):
+    return TerritorioService.importar_ubigeo(db)
