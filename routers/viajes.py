@@ -25,6 +25,7 @@ from routers.usuarios import get_current_user
 from schemas import ViajeActivoResponse
 from fastapi import Request
 from core.routes import route_manager
+from services.configuracion_service import ConfiguracionService
 
 def actualizar_estado_viaje(db, viaje, nuevo_estado):
     if not puede_transicionar(viaje.estado, nuevo_estado):
@@ -210,29 +211,41 @@ def crear_viaje(
 
     if len(activos) > 0:
         raise HTTPException(400, "Ya tienes un viaje activo")
-
-    if len(activos) > 0:
-        raise HTTPException(400, "Ya tienes un viaje activo")
+    
+    # ======================
+    # CONFIGURACIÓN DINÁMICA
+    # ======================
+    
+    precio_minimo = ConfiguracionService.obtener_float(
+        db,
+        "viajes",
+        "precio_minimo"
+    )
+    
+    precio_maximo = ConfiguracionService.obtener_float(
+        db,
+        "viajes",
+        "precio_maximo"
+    )
     
     # ======================
     # VALIDAR PRECIO
     # ======================
     
-    if viaje.precio_propuesto < PRECIO_MINIMO:
+    if viaje.precio_propuesto < precio_minimo:
     
         raise HTTPException(
             400,
-            f"El precio mínimo permitido es S/ {PRECIO_MINIMO:.2f}"
+            f"El precio mínimo permitido es S/ {precio_minimo:.2f}"
         )
     
-    if viaje.precio_propuesto > PRECIO_MAXIMO:
+    if viaje.precio_propuesto > precio_maximo:
     
         raise HTTPException(
             400,
-            f"El precio máximo permitido es S/ {PRECIO_MAXIMO:.2f}"
+            f"El precio máximo permitido es S/ {precio_maximo:.2f}"
         )
         
-
     # ======================
     # CREAR VIAJE
     # ======================
@@ -267,20 +280,32 @@ def crear_viaje(
         # VALIDAR DISTANCIA
         # ======================
     
+        distancia_minima = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "distancia_minima"
+        )
+        
+        distancia_maxima = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "distancia_maxima"
+        )
+        
         distancia = ruta["distancia_metros"]
-    
-        if distancia < DISTANCIA_MINIMA:
-    
+        
+        if distancia < distancia_minima:
+        
             raise HTTPException(
                 400,
                 "El origen y destino están demasiado cerca."
             )
-    
-        if distancia > DISTANCIA_MAXIMA:
-    
+        
+        if distancia > distancia_maxima:
+        
             raise HTTPException(
                 400,
-                "La distancia máxima permitida es de 18 km."
+                f"La distancia máxima permitida es de {distancia_maxima / 1000:.0f} km."
             )
     
         nuevo.ruta_polyline = ruta["polyline"]
