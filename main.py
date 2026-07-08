@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import Base, engine
 from routers import usuarios, viajes, ofertas, chat, evaluaciones
+from routers import admin_territorio
 
 import firebase_admin
 from firebase_admin import credentials
@@ -66,6 +67,9 @@ app.include_router(mis_viajes_router)
 app.include_router(places.router)
 app.include_router(
     admin_configuracion.router
+)
+app.include_router(
+    admin_territorio.router
 )
 
 
