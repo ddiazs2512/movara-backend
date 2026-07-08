@@ -174,17 +174,27 @@ class TerritorioService:
                             CatDepartamento.nombre == dep_nombre
                         ).first()
     
-                        if not dep:
-                            dep = CatDepartamento(
-                                pais_id=pais.id,
-                                nombre=dep_nombre,
-                                ubigeo=ubigeo[:2]
-                            )
-                            db.add(dep)
-                            db.flush()
-                            dep_nuevos += 1
-    
-                        departamentos[dep_nombre] = dep
+                        if dep is None:
+
+                            dep = db.query(CatDepartamento).filter(
+                                CatDepartamento.pais_id == pais.id,
+                                CatDepartamento.nombre == dep_nombre
+                            ).first()
+                        
+                            if dep is None:
+                        
+                                dep = CatDepartamento(
+                                    pais_id=pais.id,
+                                    nombre=dep_nombre,
+                                    ubigeo=ubigeo[:2]
+                                )
+                        
+                                db.add(dep)
+                                db.flush()
+                        
+                                dep_nuevos += 1
+                        
+                            departamentos[dep_nombre] = dep
     
                     clave = (dep.id, prov_nombre)
     
