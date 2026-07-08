@@ -112,3 +112,76 @@ class TerritorioService:
         db.refresh(relacion)
 
         return relacion
+
+    @staticmethod
+    def actualizar_area(
+        db: Session,
+        area_id: int,
+        nombre: str,
+        descripcion: str,
+        estado: int,
+        radio_operacion: int,
+        latitud: float,
+        longitud: float
+    ):
+    
+        area = db.query(AreaOperacion).filter(
+            AreaOperacion.id == area_id
+        ).first()
+    
+        if area is None:
+            return None
+    
+        area.nombre = nombre
+        area.descripcion = descripcion
+        area.estado = estado
+        area.radio_operacion = radio_operacion
+        area.latitud_centro = latitud
+        area.longitud_centro = longitud
+    
+        db.commit()
+        db.refresh(area)
+    
+        return area
+
+    @staticmethod
+    def desactivar_area(
+        db: Session,
+        area_id: int
+    ):
+    
+        area = db.query(AreaOperacion).filter(
+            AreaOperacion.id == area_id
+        ).first()
+    
+        if area is None:
+            return False
+    
+        area.activo = False
+    
+        db.commit()
+    
+        return True
+
+    @staticmethod
+    def quitar_distrito(
+        db: Session,
+        area_id: int,
+        distrito_id: int
+    ):
+    
+        relacion = db.query(
+            AreaOperacionDistrito
+        ).filter(
+            AreaOperacionDistrito.area_operacion_id == area_id,
+            AreaOperacionDistrito.distrito_id == distrito_id
+        ).first()
+    
+        if relacion is None:
+            return False
+    
+        db.delete(relacion)
+    
+        db.commit()
+    
+        return True
