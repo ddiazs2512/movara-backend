@@ -124,4 +124,19 @@ def asignar_distrito(
 def importar_ubigeo(
     db: Session = Depends(get_db)
 ):
-    return TerritorioService.importar_ubigeo(db)
+    import os
+
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    ruta = os.path.join(
+        base_dir,
+        "data",
+        "ubigeo"
+    )
+
+    return {
+        "base_dir": base_dir,
+        "ruta": ruta,
+        "existe_carpeta": os.path.isdir(ruta),
+        "archivos": os.listdir(ruta) if os.path.isdir(ruta) else []
+    }
