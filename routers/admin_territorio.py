@@ -25,6 +25,20 @@ class AreaOperacionCreate(BaseModel):
 
     longitud: float
 
+class AreaOperacionUpdate(BaseModel):
+
+    nombre: str
+
+    descripcion: str = ""
+
+    estado: int
+
+    radio_operacion: int
+
+    latitud: float
+
+    longitud: float
+
 
 class AsignarDistritoRequest(BaseModel):
 
@@ -119,3 +133,75 @@ def asignar_distrito(
 
         request.distrito_id
     )
+
+@router.put("/areas-operacion/{area_id}")
+def actualizar_area(
+
+    area_id: int,
+
+    request: AreaOperacionUpdate,
+
+    db: Session = Depends(get_db)
+
+):
+
+    area = TerritorioService.actualizar_area(
+
+        db,
+
+        area_id,
+
+        request.nombre,
+
+        request.descripcion,
+
+        request.estado,
+
+        request.radio_operacion,
+
+        request.latitud,
+
+        request.longitud
+
+    )
+
+    if area is None:
+
+        raise HTTPException(
+            404,
+            "Área no encontrada."
+        )
+
+    return area
+
+@router.delete("/areas-operacion/{area_id}/distritos/{distrito_id}")
+def quitar_distrito(
+
+    area_id: int,
+
+    distrito_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    ok = TerritorioService.quitar_distrito(
+
+        db,
+
+        area_id,
+
+        distrito_id
+
+    )
+
+    if not ok:
+
+        raise HTTPException(
+            404,
+            "Relación no encontrada."
+        )
+
+    return {
+        "ok": True
+    }
