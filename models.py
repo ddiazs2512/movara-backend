@@ -223,3 +223,26 @@ class Ubicacion(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+
+class Configuracion(Base):
+    __tablename__ = "configuracion"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    grupo = Column(String(50), nullable=False)
+
+    clave = Column(String(100), nullable=False)
+
+    valor = Column(Text, nullable=False)
+
+    tipo = Column(String(20), nullable=False)
+
+    descripcion = Column(Text, nullable=True)
+
+    editable = Column(Boolean, default=True)
+
+    fecha_actualizacion = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )
