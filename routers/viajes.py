@@ -365,14 +365,24 @@ def crear_viaje(
     # ======================
     # NOTIFICACIONES
     # ======================
+    print(f"[FCM] Conductores encontrados: {len(conductores)}")
+    print(f"[FCM] Candidatos: {len(candidatos)}")
+    
     for usuario in candidatos:
-
+    
+        print(f"[FCM] Conductor candidato: {usuario.id}")
+    
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == usuario.id,
             Usuario.activo == True
         ).all()
-
+    
+        print(f"[FCM] Tokens encontrados: {len(tokens)}")
+    
         for t in tokens:
+    
+            print(f"[FCM] Enviando a token: {t.token[:20]}...")
+    
             enviar_notificacion_data(
                 token=t.token,
                 data={
