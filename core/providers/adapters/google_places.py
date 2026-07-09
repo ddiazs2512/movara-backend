@@ -72,7 +72,12 @@ class GooglePlacesAdapter:
 
         )
 
-        response.raise_for_status()
+        if response.status_code != 200:
+            print("========== GOOGLE PLACES ERROR ==========")
+            print(response.status_code)
+            print(response.text)
+            print("=========================================")
+            response.raise_for_status()
 
         data = response.json()
 
