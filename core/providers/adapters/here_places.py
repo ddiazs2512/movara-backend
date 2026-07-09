@@ -70,28 +70,48 @@ class HerePlacesAdapter:
 
         resultados = []
 
+        vistos = set()
+
         for item in data.get("items", []):
 
-            if item.get("resultType") not in (
+            result_type = item.get("resultType")
+
+            if result_type not in (
                 "place",
-                "locality",
                 "street",
                 "houseNumber"
             ):
                 continue
 
-            resultados.append({
+            nombre = item.get("title", "").strip()
 
+            direccion = (
+                item.get("address", {})
+                    .get("label", "")
+                    .strip()
+            )
+            
+            clave = (
+                nombre.lower(),
+                direccion.lower()
+            )
+            
+            if clave in vistos:
+                continue
+            
+            vistos.add(clave)
+            
+            resultados.append({
+            
                 "id":
                     item.get("id"),
-
+            
                 "name":
-                    item.get("title"),
-
+                    nombre,
+            
                 "address":
-                    item.get("address", {})
-                        .get("label", "")
-
+                    direccion
+            
             })
 
         return resultados
