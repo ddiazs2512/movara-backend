@@ -16,12 +16,16 @@ def crear_sesion():
 @router.get("/search")
 def buscar(
     q: str,
-    session_id: str
+    session_id: str,
+    lat: float,
+    lng: float
 ):
 
     return places_service.buscar(
-        q,
-        session_id
+        query=q,
+        session_id=session_id,
+        lat=lat,
+        lng=lng
     )
 
 
