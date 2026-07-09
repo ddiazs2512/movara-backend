@@ -10,7 +10,7 @@ import os
 SERVICE_ACCOUNT_FILE = os.getenv("FIREBASE_CREDENTIALS")
 
 # 📍 ID de tu proyecto Firebase (IMPORTANTE)
-PROJECT_ID = "movara-f0278"
+PROJECT_ID = "movara-production-fb2c3"
 
 def get_access_token():
     credentials = service_account.Credentials.from_service_account_file(
