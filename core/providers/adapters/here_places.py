@@ -49,7 +49,6 @@ class HerePlacesAdapter:
         
             if lat is not None and lng is not None:
                 params["at"] = f"{lat},{lng}"
-                params["in"] = f"circle:{lat},{lng};r=10000"
 
         print("========== HERE ==========")
         print({
