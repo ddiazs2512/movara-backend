@@ -37,7 +37,7 @@ class HerePlacesAdapter:
             "q": query,
             "apiKey": HERE_API_KEY,
             "lang": "es-PE",
-            "limit": 10
+            "limit": 5
         }
         
         if location_bias:
@@ -49,9 +49,15 @@ class HerePlacesAdapter:
         
             if lat is not None and lng is not None:
                 params["at"] = f"{lat},{lng}"
+                params["in"] = f"circle:{lat},{lng};r=10000"
 
         print("========== HERE ==========")
-        print(params)
+        print({
+            "q": params["q"],
+            "lang": params["lang"],
+            "limit": params["limit"],
+            "at": params.get("at")
+        })
         print("==========================")
 
         response = requests.get(
@@ -77,19 +83,21 @@ class HerePlacesAdapter:
             result_type = item.get("resultType")
 
             if result_type not in (
-                "place",
                 "street",
-                "houseNumber"
+                "place"
             ):
                 continue
 
             nombre = item.get("title", "").strip()
-
+            
             direccion = (
                 item.get("address", {})
                     .get("label", "")
                     .strip()
             )
+            
+            if direccion.startswith(nombre):
+                direccion = direccion[len(nombre):].lstrip(" ,-")
             
             clave = (
                 nombre.lower(),
