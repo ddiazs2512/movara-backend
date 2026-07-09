@@ -19,15 +19,17 @@ class PlacesService:
     def buscar(
         self,
         query: str,
-        session_id: str
+        session_id: str,
+        lat: float,
+        lng: float
     ):
 
         query = query_normalizer.normalize(query)
 
         location_bias = location_bias_builder.build(
-            lat=-12.0464,
-            lng=-77.0428,
-            radio=30000
+            lat=lat,
+            lng=lng,
+            radio=10000
         )
 
         url = "https://places.googleapis.com/v1/places:autocomplete"
