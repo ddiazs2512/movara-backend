@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "216060705025",
-    "firebase_url": "https://movara-f0278-default-rtdb.firebaseio.com",
-    "project_id": "movara-f0278",
-    "storage_bucket": "movara-f0278.firebasestorage.app"
+    "project_number": "143487112397",
+    "project_id": "movara-production-fb2c3",
+    "storage_bucket": "movara-production-fb2c3.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:216060705025:android:0dd7354e0f19480aaa8300",
+        "mobilesdk_app_id": "1:143487112397:android:1a5642514c2118e9d5c584",
         "android_client_info": {
           "package_name": "com.movara.app"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAocxdyfHLwXJVqNEbRKbdRKwH_1meyiOo"
+          "current_key": "AIzaSyCP0JtxKk0P_aAndk7KND0f4dKE4eivus0"
         }
       ],
       "services": {
