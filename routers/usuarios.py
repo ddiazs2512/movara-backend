@@ -135,7 +135,7 @@ def login(usuario: UsuarioLogin, db: Session = Depends(get_db)):
 def obtener_version():
 
     return {
-        "version_minima": 14,
+        "version_minima": 16,
         "forzar": True
     }
 
