@@ -90,3 +90,5 @@ class PlacesService:
             "data": data
     
         }
+        
+places_service = PlacesService()
