@@ -13,6 +13,9 @@ from core.providers.adapters.mapbox_directions import (
 from core.providers.adapters.tomtom_directions import (
     tomtom_directions_adapter
 )
+from core.providers.adapters.here_places import (
+    here_places_adapter
+)
 
 
 class ProviderRegistry:
@@ -77,4 +80,8 @@ provider_registry.register(
 provider_registry.register(
     "tomtom",
     tomtom_directions_adapter
+)
+provider_registry.register(
+    "here",
+    here_places_adapter
 )
