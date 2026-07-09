@@ -34,16 +34,25 @@ class HerePlacesAdapter:
     ):
 
         params = {
-
             "q": query,
-
             "apiKey": HERE_API_KEY,
-
             "lang": "es-PE",
-
             "limit": 10
-
         }
+        
+        if location_bias:
+        
+            center = location_bias.get("circle", {}).get("center", {})
+        
+            lat = center.get("latitude")
+            lng = center.get("longitude")
+        
+            if lat is not None and lng is not None:
+                params["at"] = f"{lat},{lng}"
+
+        print("========== HERE ==========")
+        print(params)
+        print("==========================")
 
         response = requests.get(
 
