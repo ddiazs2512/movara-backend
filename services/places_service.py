@@ -110,6 +110,43 @@ class PlacesService:
         
         )
         
+        if resultados:
+        
+            return {
+        
+                "success": True,
+        
+                "items": resultados
+        
+            }
+        
+        # ==========================
+        # Intento 3
+        # Bias 50 km
+        # ==========================
+        
+        location_bias = location_bias_builder.build_bias(
+        
+            lat=lat,
+        
+            lng=lng,
+        
+            radio=50000
+        
+        )
+        
+        resultados = self._buscar_provider(
+        
+            query=query,
+        
+            session_token=session_token,
+        
+            location_bias=location_bias,
+        
+            origin=origin
+        
+        )
+        
         return {
         
             "success": True,
@@ -117,6 +154,7 @@ class PlacesService:
             "items": resultados
         
         }
+
     def _buscar_provider(
         self,
         query: str,
