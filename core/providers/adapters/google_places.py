@@ -33,7 +33,9 @@ class GooglePlacesAdapter:
         self,
         query: str,
         session_token: str,
-        location_bias: dict | None = None
+        location_bias: dict | None = None,
+        location_restriction: dict | None = None,
+        origin: dict | None = None
     ):
 
         headers = {
@@ -59,6 +61,14 @@ class GooglePlacesAdapter:
         if location_bias:
         
             body["locationBias"] = location_bias
+
+        if location_restriction:
+
+            body["locationRestriction"] = location_restriction
+
+        if origin:
+
+            body["origin"] = origin
 
         response = requests.post(
 
