@@ -115,12 +115,60 @@ class ProviderEngine:
         lng: float
     ):
     
+        # =========================
+        # CACHE KEY
+        # =========================
+    
+        cache_key = (
+            f"reverse:"
+            f"{round(lat, 4)}:"
+            f"{round(lng, 4)}"
+        )
+    
+        # =========================
+        # CACHE HIT
+        # =========================
+    
+        cached = cache_manager.get(cache_key)
+    
+        if cached is not None:
+    
+            print(f"[REVERSE CACHE HIT] {cache_key}")
+    
+            return cached
+    
+        print(f"[REVERSE CACHE MISS] {cache_key}")
+    
+        # =========================
+        # MAPBOX
+        # =========================
+    
         provider = self.get_reverse()
     
-        return provider.reverse_geocode(
+        direccion = provider.reverse_geocode(
             lat=lat,
             lng=lng
         )
+    
+        # =========================
+        # SAVE CACHE
+        # =========================
+    
+        cache_manager.set(
+    
+            key=cache_key,
+    
+            value=direccion,
+    
+            ttl=60,
+    
+            provider="mapbox"
+    
+        )
+    
+        print(f"[REVERSE CACHE SAVE] {cache_key}")
+    
+        return direccion
 
     # ======================================
     # DIRECTIONS
