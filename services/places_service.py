@@ -39,8 +39,8 @@ class PlacesService:
         # Si todavía no hay ubicación válida,
         # buscar sin restriction ni origin
         if lat == 0.0 or lng == 0.0:
-        
-            resultados = provider_engine.places_search(
+
+            resultados = self._buscar_provider(
         
                 query=query,
         
@@ -56,8 +56,49 @@ class PlacesService:
         
             }
         
-        # Ya hay ubicación válida
-        resultados = provider_engine.places_search(
+        # ==========================
+        # Intento 1
+        # Restriction 10 km
+        # ==========================
+        
+        resultados = self._buscar_provider(
+        
+            query=query,
+        
+            session_token=session_token,
+        
+            location_restriction=location_restriction,
+        
+            origin=origin
+        
+        )
+        
+        if resultados:
+        
+            return {
+        
+                "success": True,
+        
+                "items": resultados
+        
+            }
+        
+        # ==========================
+        # Intento 2
+        # Restriction 25 km
+        # ==========================
+        
+        location_restriction = location_bias_builder.build_restriction(
+        
+            lat=lat,
+        
+            lng=lng,
+        
+            radio=25000
+        
+        )
+        
+        resultados = self._buscar_provider(
         
             query=query,
         
@@ -76,6 +117,28 @@ class PlacesService:
             "items": resultados
         
         }
+    def _buscar_provider(
+        self,
+        query: str,
+        session_token: str,
+        location_bias: dict | None = None,
+        location_restriction: dict | None = None,
+        origin: dict | None = None
+    ):
+    
+        return provider_engine.places_search(
+    
+            query=query,
+    
+            session_token=session_token,
+    
+            location_bias=location_bias,
+    
+            location_restriction=location_restriction,
+    
+            origin=origin
+    
+        )
 
     def crear_sesion(self):
 
