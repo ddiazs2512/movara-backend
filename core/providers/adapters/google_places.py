@@ -21,6 +21,10 @@ if not GOOGLE_PLACES_API_KEY:
 
 class GooglePlacesAdapter:
 
+    def __init__(self):
+
+        self.total_calls = 0
+
     AUTOCOMPLETE_URL = (
         "https://places.googleapis.com/v1/places:autocomplete"
     )
@@ -73,6 +77,13 @@ class GooglePlacesAdapter:
         print("========== GOOGLE REQUEST ==========")
         print(body)
         print("====================================")
+
+        self.total_calls += 1
+        
+        print("===================================")
+        print("GOOGLE PLACES CALL:", self.total_calls)
+        print("Query:", query)
+        print("===================================")
 
         response = requests.post(
 
@@ -177,6 +188,5 @@ class GooglePlacesAdapter:
                     .get("longitude")
 
         }
-
-
+        
 google_places_adapter = GooglePlacesAdapter()
