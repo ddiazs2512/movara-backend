@@ -117,7 +117,10 @@ class PlacesService:
         
         }
         
-        if consulta in palabras_genericas:
+        if any(
+            palabra.startswith(consulta)
+            for palabra in palabras_genericas
+        ):
         
             location_restriction = location_bias_builder.build_restriction(
         
