@@ -114,8 +114,13 @@ class ProviderEngine:
         lat: float,
         lng: float
     ):
-
-        raise NotImplementedError()
+    
+        provider = self.get_reverse()
+    
+        return provider.reverse_geocode(
+            lat=lat,
+            lng=lng
+        )
 
     # ======================================
     # DIRECTIONS
