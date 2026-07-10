@@ -41,10 +41,10 @@ DRIVER_REVERSE_DISTANCE = 50
 MAX_PROVIDER_REQUESTS_PER_MINUTE = 500
 
 # --------------------------
-# PROVIDERS
+# PROVIDERS0
 # --------------------------
 
-PRIMARY_PLACES_PROVIDER = "google"
+PRIMARY_PLACES_PROVIDER = "here"
 
 PRIMARY_REVERSE_PROVIDER = "mapbox"
 
