@@ -14,7 +14,7 @@ class LocationBiasBuilder:
         self,
         lat: float,
         lng: float,
-        radio: int = 30000
+        radio: int = 10000
     ) -> dict:
 
         return {
