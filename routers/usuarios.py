@@ -124,7 +124,9 @@ def login(usuario: UsuarioLogin, db: Session = Depends(get_db)):
         "rol": user.rol,
         "nombre": user.nombre,
         "modo": user.modo_actual,
-        "token": access_token
+        "token": access_token,
+        "rating": user.rating,
+        "total_viajes": user.total_viajes
     }
 
 # ======================
