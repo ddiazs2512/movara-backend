@@ -57,81 +57,95 @@ class PlacesService:
             }
         
         # ==========================
-        # Intento 1
-        # Restriction 10 km
+        # Búsqueda inteligente
         # ==========================
         
-        resultados = self._buscar_provider(
+        location_bias = None
+        location_restriction = None
         
-            query=query,
+        consulta = query.lower()
         
-            session_token=session_token,
+        palabras_genericas = {
         
-            location_restriction=location_restriction,
+            "grifo",
+            "hospital",
+            "farmacia",
+            "mercado",
+            "hotel",
+            "restaurante",
+            "colegio",
+            "universidad",
+            "parque",
+            "plaza",
+            "banco",
+            "cajero",
         
-            origin=origin
+            "cementerio",
+            "discoteca",
+            "piscina",
+            "iglesia",
+            "estadio",
+            "terminal",
+            "mall",
+            "supermercado",
+            "minimarket",
+            "gimnasio",
+            "cafetería",
+            "bar",
+            "panadería",
+            "botica",
+            "posta",
+            "clínica",
+            "veterinaria",
+            "ferretería",
+            "librería",
+            "notaría",
+            "comisaría",
+            "municipalidad",
+            "universidad",
+            "instituto",
+            "cine",
+            "teatro",
+            "mirador",
+            "playa",
+            "cancha",
+            "lavadero",
+            "car wash",
+            "taller",
+            "mecánico",
+            "lubricentro"
         
-        )
+        }
         
-        if resultados:
+        if consulta in palabras_genericas:
         
-            return {
+            location_restriction = location_bias_builder.build_restriction(
         
-                "success": True,
+                lat=lat,
         
-                "items": resultados
+                lng=lng,
         
-            }
+                radio=10000
         
-        # ==========================
-        # Intento 2
-        # Restriction 25 km
-        # ==========================
+            )
         
-        location_restriction = location_bias_builder.build_restriction(
+        else:
+        
+            location_bias = location_bias_builder.build_bias(
+        
+                lat=lat,
+        
+                lng=lng,
+        
+                radio=50000
+        
+            )
+        
+        origin = location_bias_builder.build_origin(
         
             lat=lat,
         
-            lng=lng,
-        
-            radio=25000
-        
-        )
-        
-        resultados = self._buscar_provider(
-        
-            query=query,
-        
-            session_token=session_token,
-        
-            location_restriction=location_restriction,
-        
-            origin=origin
-        
-        )
-        
-        if resultados:
-        
-            return {
-        
-                "success": True,
-        
-                "items": resultados
-        
-            }
-        
-        # ==========================
-        # Intento 3
-        # Bias 50 km
-        # ==========================
-        
-        location_bias = location_bias_builder.build_bias(
-        
-            lat=lat,
-        
-            lng=lng,
-        
-            radio=50000
+            lng=lng
         
         )
         
@@ -142,6 +156,8 @@ class PlacesService:
             session_token=session_token,
         
             location_bias=location_bias,
+        
+            location_restriction=location_restriction,
         
             origin=origin
         
@@ -154,7 +170,6 @@ class PlacesService:
             "items": resultados
         
         }
-
     def _buscar_provider(
         self,
         query: str,
