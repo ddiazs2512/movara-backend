@@ -38,7 +38,7 @@ class PlacesService:
         
         # Si todavía no hay ubicación válida,
         # buscar sin restriction ni origin
-        if lat == 0.0 and lng == 0.0:
+        if lat == 0.0 or lng == 0.0:
         
             resultados = provider_engine.places_search(
         
