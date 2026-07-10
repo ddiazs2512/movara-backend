@@ -71,15 +71,25 @@ class ProviderEngine:
         self,
         query: str,
         session_token: str,
-        location_bias: dict | None = None
+        location_bias: dict | None = None,
+        location_restriction: dict | None = None,
+        origin: dict | None = None
     ):
     
         provider = self.get_places()
     
         return provider.places_search(
+
             query=query,
+        
             session_token=session_token,
-            location_bias=location_bias
+        
+            location_bias=location_bias,
+        
+            location_restriction=location_restriction,
+        
+            origin=origin
+        
         )
 
     def place_detail(
