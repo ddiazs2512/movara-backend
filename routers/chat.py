@@ -60,25 +60,25 @@ def enviar_mensaje(data: MensajeRequest, db: Session = Depends(get_db)):
     db.refresh(nuevo)
 
     # =========================
-# FCM
-# =========================
-
-tokens = db.query(FCMToken).filter(
-    FCMToken.usuario_id == receptor_real
-).all()
-
-for t in tokens:
-
-    enviar_notificacion_data(
-        token=t.token,
-        data={
-            "type": "nuevo_mensaje",
-            "viaje_id": str(viaje.id),
-            "emisor_id": str(data.emisor_id),
-            "title": "Tienes un nuevo mensaje",
-            "body": data.mensaje
-        }
-    )
+    # FCM
+    # =========================
+    
+    tokens = db.query(FCMToken).filter(
+        FCMToken.usuario_id == receptor_real
+    ).all()
+    
+    for t in tokens:
+    
+        enviar_notificacion_data(
+            token=t.token,
+            data={
+                "type": "nuevo_mensaje",
+                "viaje_id": str(viaje.id),
+                "emisor_id": str(data.emisor_id),
+                "title": "Tienes un nuevo mensaje",
+                "body": data.mensaje
+            }
+        )
 
     return {
         "mensaje": "ok",
