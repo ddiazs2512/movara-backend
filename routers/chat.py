@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Mensaje, Usuario, Viaje, FCMToken
+from firebase_service import enviar_notificacion_data
 from pydantic import BaseModel
 
 router = APIRouter()
