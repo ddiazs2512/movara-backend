@@ -1,5 +1,3 @@
-import os
-import requests
 from services.session_token_service import session_token_service
 from core.providers.ProviderEngine import provider_engine
 
@@ -7,12 +5,6 @@ from core.places import (
     query_normalizer,
     location_bias_builder
 )
-
-GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
-
-if not GOOGLE_PLACES_API_KEY:
-    raise Exception("GOOGLE_PLACES_API_KEY no definida")
-
 
 class PlacesService:
 
@@ -26,18 +18,16 @@ class PlacesService:
 
         query = query_normalizer.normalize(query)
 
-        location_bias = location_bias_builder.build(
+        location_restriction = location_bias_builder.build_restriction(
             lat=lat,
             lng=lng,
             radio=10000
         )
-
-        url = "https://places.googleapis.com/v1/places:autocomplete"
-
-        headers = {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY
-        }
+        
+        origin = location_bias_builder.build_origin(
+            lat=lat,
+            lng=lng
+        )
 
         session_token = session_token_service.obtener_session_token(
             session_id
@@ -47,9 +37,15 @@ class PlacesService:
             raise Exception("Sesión no encontrada")
         
         resultados = provider_engine.places_search(
+
             query=query,
+        
             session_token=session_token,
-            location_bias=location_bias
+        
+            location_restriction=location_restriction,
+        
+            origin=origin
+        
         )
         return {
             "success": True,
