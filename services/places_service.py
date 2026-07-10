@@ -36,8 +36,29 @@ class PlacesService:
         if not session_token:
             raise Exception("Sesión no encontrada")
         
+        # Si todavía no hay ubicación válida,
+        # buscar sin restriction ni origin
+        if lat == 0.0 and lng == 0.0:
+        
+            resultados = provider_engine.places_search(
+        
+                query=query,
+        
+                session_token=session_token
+        
+            )
+        
+            return {
+        
+                "success": True,
+        
+                "items": resultados
+        
+            }
+        
+        # Ya hay ubicación válida
         resultados = provider_engine.places_search(
-
+        
             query=query,
         
             session_token=session_token,
@@ -47,9 +68,13 @@ class PlacesService:
             origin=origin
         
         )
+        
         return {
+        
             "success": True,
+        
             "items": resultados
+        
         }
 
     def crear_sesion(self):
