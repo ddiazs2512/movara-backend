@@ -70,6 +70,10 @@ class GooglePlacesAdapter:
 
             body["origin"] = origin
 
+        print("========== GOOGLE REQUEST ==========")
+        print(body)
+        print("====================================")
+
         response = requests.post(
 
             self.AUTOCOMPLETE_URL,
