@@ -745,6 +745,29 @@ def viaje_activo(
         Oferta.estado == "activa"
     ).all()
 
+    # ======================
+    # USUARIOS DE OFERTAS
+    # ======================
+    
+    conductores = {}
+    
+    if ofertas:
+    
+        conductor_ids = list({
+            o.conductor_id
+            for o in ofertas
+            if o.conductor_id
+        })
+    
+        usuarios = db.query(Usuario).filter(
+            Usuario.id.in_(conductor_ids)
+        ).all()
+    
+        conductores = {
+            u.id: u
+            for u in usuarios
+        }
+
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.viaje_id == viaje.id
     ).order_by(
@@ -806,22 +829,19 @@ def viaje_activo(
                 "precio": o.precio,
         
                 "conductor_nombre":
-                    db.query(Usuario)
-                    .filter(Usuario.id == o.conductor_id)
-                    .first().nombre
-                    if o.conductor_id else None,
+                    conductores.get(o.conductor_id).nombre
+                    if conductores.get(o.conductor_id)
+                    else None,
         
                 "rating":
-                    db.query(Usuario)
-                    .filter(Usuario.id == o.conductor_id)
-                    .first().rating
-                    if o.conductor_id else 0,
+                    conductores.get(o.conductor_id).rating
+                    if conductores.get(o.conductor_id)
+                    else 0,
         
                 "total_viajes":
-                    db.query(Usuario)
-                    .filter(Usuario.id == o.conductor_id)
-                    .first().total_viajes
-                    if o.conductor_id else 0,
+                    conductores.get(o.conductor_id).total_viajes
+                    if conductores.get(o.conductor_id)
+                    else 0,
         
                 "timestamp":
                     int(o.fecha_creacion.timestamp() * 1000)
