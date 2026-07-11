@@ -583,15 +583,15 @@ def viajes_disponibles(
         if distancia > 4000:
             continue
 
-                cliente_rating = (
-                    v.cliente.rating
-                    if v.cliente else 0
-                )
-        
-                cliente_total = (
-                    v.cliente.total_viajes
-                    if v.cliente else 0
-                )
+        cliente_rating = (
+            v.cliente.rating
+            if v.cliente else 0
+        )
+
+        cliente_total = (
+            v.cliente.total_viajes
+            if v.cliente else 0
+        )
         
         resultado.append({
             "id": v.id,
