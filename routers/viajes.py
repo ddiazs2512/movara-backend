@@ -740,10 +740,18 @@ def viaje_activo(
         if conductor_usuario else 0
     )
 
-    ofertas = db.query(Oferta).filter(
-        Oferta.viaje_id == viaje.id,
-        Oferta.estado == "activa"
-    ).all()
+    # ======================
+    # OFERTAS
+    # ======================
+    
+    ofertas = []
+    
+    if viaje.estado == "oferta":
+    
+        ofertas = db.query(Oferta).filter(
+            Oferta.viaje_id == viaje.id,
+            Oferta.estado == "activa"
+        ).all()
 
     # ======================
     # USUARIOS DE OFERTAS
