@@ -583,23 +583,14 @@ def viajes_disponibles(
         if distancia > 4000:
             continue
 
-        cliente_rating = 0
-        cliente_total = 0
+                cliente_rating = (
+                    v.cliente.rating
+                    if v.cliente else 0
+                )
         
-        if v.cliente:
-        
-            evaluaciones_cliente = db.query(Evaluacion).filter(
-                Evaluacion.evaluado_id == v.cliente.id
-            ).all()
-        
-            if evaluaciones_cliente:
-        
-                cliente_total = len(evaluaciones_cliente)
-        
-                cliente_rating = round(
-                    sum(e.estrellas for e in evaluaciones_cliente)
-                    / cliente_total,
-                    1
+                cliente_total = (
+                    v.cliente.total_viajes
+                    if v.cliente else 0
                 )
         
         resultado.append({
