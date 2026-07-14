@@ -1370,12 +1370,27 @@ def detectar_ciudad(db, lat, lng):
 @router.post("/actualizar_ubicacion_disponible")
 def actualizar_ubicacion_disponible(
     data: UbicacionConductorRequest,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user)
 ):
 
     if current_user.rol != "conductor":
         raise HTTPException(403, "Solo conductores")
+
+    # ======================
+    # LOG CONDUCTOR
+    # ======================
+    
+    print(
+        f"[UBICACION] "
+        f"usuario_id={current_user.id} "
+        f"nombre={current_user.nombre} "
+        f"telefono={current_user.telefono} "
+        f"ip={request.client.host} "
+        f"lat={data.lat} "
+        f"lng={data.lng}"
+    )
 
     ubicacion = db.query(Ubicacion).filter(
         Ubicacion.conductor_id == current_user.id,
@@ -1411,6 +1426,15 @@ def actualizar_ubicacion_disponible(
         data.lat,
         data.lng
     )
+
+    if ciudad:
+
+        print(
+            f"[CIUDAD] "
+            f"usuario_id={current_user.id} "
+            f"ciudad={ciudad['nombre']} "
+            f"ip={request.client.host}"
+        )
 
     if ciudad:
 
