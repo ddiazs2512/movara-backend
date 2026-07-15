@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | Movara Control Center
+{% endblock %}
+
+{% block content %}
+
+<div class="page">
+
+    <div class="page-header">
+
+        <h2>🏠 Dashboard</h2>
+
+        <p>
+            Bienvenido al Movara Control Center
+        </p>
+
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>🚕 Viajes Activos</h3>
+            <h1>0</h1>
+        </div>
+
+        <div class="card">
+            <h3>🚗 Conductores Online</h3>
+            <h1>0</h1>
+        </div>
+
+        <div class="card">
+            <h3>👥 Usuarios Conectados</h3>
+            <h1>0</h1>
+        </div>
+
+        <div class="card">
+            <h3>📦 Entregas Activas</h3>
+            <h1>0</h1>
+        </div>
+
+    </div>
+
+    <div class="dashboard-panel">
+
+        <h3>📊 Estado de la Plataforma</h3>
+
+        <table class="status-table">
+
+            <tr>
+                <td>🗄 PostgreSQL</td>
+                <td>✅ Operativo</td>
+            </tr>
+
+            <tr>
+                <td>🔥 Firebase</td>
+                <td>✅ Operativo</td>
+            </tr>
+
+            <tr>
+                <td>📡 WebSocket</td>
+                <td>✅ Operativo</td>
+            </tr>
+
+            <tr>
+                <td>🚕 API Movara</td>
+                <td>✅ Operativa</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
