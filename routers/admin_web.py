@@ -4,21 +4,19 @@ from fastapi.templating import Jinja2Templates
 
 router = APIRouter(
     prefix="/admin",
-    tags=["Admin Web"]
+    tags=["Movara Control Center"]
 )
 
-templates = Jinja2Templates(
-    directory="templates"
-)
+templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/", response_class=HTMLResponse)
-def dashboard(
-    request: Request
-):
+async def dashboard(request: Request):
+
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request
+        request=request,
+        name="dashboard/index.html",
+        context={
+            "page_title": "Dashboard"
         }
     )
