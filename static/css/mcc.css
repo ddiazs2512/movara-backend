@@ -1,0 +1,329 @@
+/* ===============================
+   MOVARA CONTROL CENTER
+   =============================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+
+    background:#101418;
+
+    color:#ECECEC;
+
+}
+
+/* ===============================
+   LAYOUT
+   =============================== */
+
+.layout{
+
+    display:flex;
+
+    min-height:100vh;
+
+}
+
+/* ===============================
+   SIDEBAR
+   =============================== */
+
+.sidebar{
+
+    width:260px;
+
+    background:#1A1F25;
+
+    border-right:1px solid #2E343B;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.logo{
+
+    padding:25px;
+
+    border-bottom:1px solid #2E343B;
+
+}
+
+.logo h2{
+
+    font-size:22px;
+
+    margin-bottom:5px;
+
+}
+
+.logo span{
+
+    color:#9AA4AE;
+
+    font-size:13px;
+
+}
+
+.menu{
+
+    display:flex;
+
+    flex-direction:column;
+
+    margin-top:20px;
+
+}
+
+.menu a{
+
+    color:#ECECEC;
+
+    text-decoration:none;
+
+    padding:14px 22px;
+
+    transition:.2s;
+
+}
+
+.menu a:hover{
+
+    background:#2A3138;
+
+}
+
+.sidebar-footer{
+
+    margin-top:auto;
+
+    padding:20px;
+
+    border-top:1px solid #2E343B;
+
+    color:#9AA4AE;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+
+}
+
+/* ===============================
+   CONTENIDO
+   =============================== */
+
+.content{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ===============================
+   HEADER
+   =============================== */
+
+.header{
+
+    height:70px;
+
+    background:#1A1F25;
+
+    border-bottom:1px solid #2E343B;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 25px;
+
+}
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.badge-dev{
+
+    padding:6px 12px;
+
+    border-radius:6px;
+
+    background:#2E343B;
+
+    font-size:12px;
+
+}
+
+/* ===============================
+   MAIN
+   =============================== */
+
+.main{
+
+    flex:1;
+
+    padding:30px;
+
+}
+
+/* ===============================
+   DASHBOARD
+   =============================== */
+
+.page-header{
+
+    margin-bottom:25px;
+
+}
+
+.page-header h2{
+
+    margin-bottom:8px;
+
+}
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+    margin-bottom:30px;
+
+}
+
+.card{
+
+    background:#1A1F25;
+
+    border:1px solid #2E343B;
+
+    border-radius:10px;
+
+    padding:20px;
+
+}
+
+.card h3{
+
+    font-size:15px;
+
+    margin-bottom:15px;
+
+}
+
+.card h1{
+
+    font-size:34px;
+
+}
+
+.dashboard-panel{
+
+    background:#1A1F25;
+
+    border:1px solid #2E343B;
+
+    border-radius:10px;
+
+    padding:20px;
+
+}
+
+.status-table{
+
+    width:100%;
+
+    margin-top:20px;
+
+    border-collapse:collapse;
+
+}
+
+.status-table td{
+
+    padding:12px;
+
+    border-bottom:1px solid #2E343B;
+
+}
+
+/* ===============================
+   FOOTER
+   =============================== */
+
+.footer{
+
+    height:45px;
+
+    border-top:1px solid #2E343B;
+
+    background:#1A1F25;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 20px;
+
+    color:#9AA4AE;
+
+    font-size:13px;
+
+}
+
+/* ===============================
+   RESPONSIVE
+   =============================== */
+
+@media(max-width:1200px){
+
+.cards{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.sidebar{
+
+display:none;
+
+}
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+}
