@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Movara Control Center
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="/static/css/mcc.css">
+
+    {% block css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        {% include "components/sidebar.html" %}
+    </aside>
+
+    <!-- Contenido -->
+    <div class="content">
+
+        <!-- Header -->
+        <header class="header">
+            {% include "components/header.html" %}
+        </header>
+
+        <!-- Página -->
+        <main class="main">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            {% include "components/footer.html" %}
+        </footer>
+
+    </div>
+
+</div>
+
+<script src="/static/js/app.js"></script>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>
