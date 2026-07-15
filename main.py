@@ -16,6 +16,7 @@ from websocket.mis_viajes_ws import router as mis_viajes_router
 from routers import admin_configuracion
 from routers import places
 from routers import reverse_geocode
+from routers import admin_web
 
 # ======================
 # CONFIG INICIAL
@@ -73,6 +74,7 @@ app.include_router(
     admin_territorio.router
 )
 app.include_router(reverse_geocode.router)
+app.include_router(admin_web.router)
 
 
 # ======================
