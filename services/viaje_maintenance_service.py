@@ -63,16 +63,163 @@ class ViajeMaintenanceService:
 
     @staticmethod
     def revisar_asignados(db: Session):
-        pass
+    
+        timeout = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "asignado_timeout"
+        )
+    
+        viajes = db.query(Viaje).filter(
+            Viaje.estado == "asignado"
+        ).all()
+    
+        cancelados = 0
+    
+        for viaje in viajes:
+    
+            if viaje.fecha_ultima_accion is None:
+                continue
+    
+            tiempo = datetime.utcnow() - viaje.fecha_ultima_accion
+    
+            if tiempo >= timedelta(minutes=timeout):
+    
+                print(
+                    f"[MANTENIMIENTO] "
+                    f"Cancelando viaje {viaje.id} "
+                    f"(asignado)"
+                )
+    
+                actualizar_estado_viaje(
+                    db,
+                    viaje,
+                    "cancelado"
+                )
+    
+                cancelados += 1
+    
+        if cancelados:
+    
+            print(
+                f"[MANTENIMIENTO] "
+                f"Asignados cancelados: {cancelados}"
+            )
 
     @staticmethod
     def revisar_en_camino(db: Session):
-        pass
+    
+        timeout = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "en_camino_timeout"
+        )
+    
+        viajes = db.query(Viaje).filter(
+            Viaje.estado == "en_camino"
+        ).all()
+    
+        cancelados = 0
+    
+        for viaje in viajes:
+    
+            if viaje.fecha_ultima_accion is None:
+                continue
+    
+            tiempo = datetime.utcnow() - viaje.fecha_ultima_accion
+    
+            if tiempo >= timedelta(minutes=timeout):
+    
+                print(
+                    f"[MANTENIMIENTO] "
+                    f"Cancelando viaje {viaje.id} "
+                    f"(en_camino)"
+                )
+    
+                actualizar_estado_viaje(
+                    db,
+                    viaje,
+                    "cancelado"
+                )
+    
+                cancelados += 1
+    
+        if cancelados:
+    
+            print(
+                f"[MANTENIMIENTO] "
+                f"En camino cancelados: {cancelados}"
+            )
 
     @staticmethod
     def revisar_llegados(db: Session):
-        pass
+    
+        timeout = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "llegado_timeout"
+        )
+    
+        viajes = db.query(Viaje).filter(
+            Viaje.estado == "llegado"
+        ).all()
+    
+        cancelados = 0
+    
+        for viaje in viajes:
+    
+            if viaje.fecha_ultima_accion is None:
+                continue
+    
+            tiempo = datetime.utcnow() - viaje.fecha_ultima_accion
+    
+            if tiempo >= timedelta(minutes=timeout):
+    
+                print(
+                    f"[MANTENIMIENTO] "
+                    f"Cancelando viaje {viaje.id} "
+                    f"(llegado)"
+                )
+    
+                actualizar_estado_viaje(
+                    db,
+                    viaje,
+                    "cancelado"
+                )
+    
+                cancelados += 1
+    
+        if cancelados:
+    
+            print(
+                f"[MANTENIMIENTO] "
+                f"Llegados cancelados: {cancelados}"
+            )
 
     @staticmethod
     def revisar_en_curso(db: Session):
-        pass
+    
+        timeout = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "en_curso_timeout"
+        )
+    
+        viajes = db.query(Viaje).filter(
+            Viaje.estado == "en_curso"
+        ).all()
+    
+        for viaje in viajes:
+    
+            if viaje.fecha_ultima_accion is None:
+                continue
+    
+            tiempo = datetime.utcnow() - viaje.fecha_ultima_accion
+    
+            if tiempo >= timedelta(minutes=timeout):
+    
+                print(
+                    f"[MANTENIMIENTO] "
+                    f"Viaje {viaje.id} "
+                    f"requiere revisión."
+                )
