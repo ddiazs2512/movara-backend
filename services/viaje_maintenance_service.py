@@ -1,11 +1,37 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from models import Viaje
+from models import Viaje, Oferta
 from routers.viajes import actualizar_estado_viaje
 from services.configuracion_service import ConfiguracionService
 
 class ViajeMaintenanceService:
+
+    @staticmethod
+    def _cancelar_viaje(db: Session, viaje: Viaje):
+    
+        # Cancelar ofertas activas del viaje
+        db.query(Oferta).filter(
+            Oferta.viaje_id == viaje.id,
+            Oferta.estado == "activa"
+        ).update(
+            {
+                "estado": "rechazada"
+            },
+            synchronize_session=False
+        )
+    
+        # Cambiar estado del viaje
+        actualizar_estado_viaje(
+            db,
+            viaje,
+            "cancelado"
+        )
+    
+        print(
+            f"[MANTENIMIENTO] "
+            f"Viaje {viaje.id} cancelado automáticamente."
+        )
 
     @staticmethod
     def ejecutar(db: Session):
@@ -50,10 +76,9 @@ class ViajeMaintenanceService:
                     f"por timeout ({timeout} min)"
                 )
     
-                actualizar_estado_viaje(
+                ViajeMaintenanceService._cancelar_viaje(
                     db,
-                    viaje,
-                    "cancelado"
+                    viaje
                 )
     
                 cancelados += 1
@@ -95,10 +120,9 @@ class ViajeMaintenanceService:
                     f"(asignado)"
                 )
     
-                actualizar_estado_viaje(
+                ViajeMaintenanceService._cancelar_viaje(
                     db,
-                    viaje,
-                    "cancelado"
+                    viaje
                 )
     
                 cancelados += 1
@@ -140,10 +164,9 @@ class ViajeMaintenanceService:
                     f"(en_camino)"
                 )
     
-                actualizar_estado_viaje(
+                ViajeMaintenanceService._cancelar_viaje(
                     db,
-                    viaje,
-                    "cancelado"
+                    viaje
                 )
     
                 cancelados += 1
@@ -185,10 +208,9 @@ class ViajeMaintenanceService:
                     f"(llegado)"
                 )
     
-                actualizar_estado_viaje(
+                ViajeMaintenanceService._cancelar_viaje(
                     db,
-                    viaje,
-                    "cancelado"
+                    viaje
                 )
     
                 cancelados += 1
