@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import bcrypt
 from fastapi.security import OAuth2PasswordBearer
 import random
+from routers.viajes import detectar_ciudad
 from sqlalchemy import or_
 
 from auth import verify_token, create_access_token
@@ -482,7 +483,7 @@ def actualizar_mi_ciudad(
     db: Session = Depends(get_db)
 ):
 
-    from routers.viajes import detectar_ciudad
+    print(f"[GPS CLIENTE] {user.telefono} lat={data.lat} lng={data.lng}")
 
     ciudad = detectar_ciudad(
         db,
@@ -491,6 +492,7 @@ def actualizar_mi_ciudad(
     )
 
     if not ciudad:
+        print("[GPS CLIENTE] Ciudad no encontrada")
         return {
             "mensaje": "Ciudad no encontrada"
         }
