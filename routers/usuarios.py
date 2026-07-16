@@ -51,6 +51,8 @@ class UsuarioCreate(BaseModel):
     telefono: str
     password: str
     nombre: str
+    lat: float
+    lng: float
 
 class UsuarioLogin(BaseModel):
     telefono: str
@@ -73,26 +75,53 @@ def register(
     db: Session = Depends(get_db)
 ):
 
-    existente = db.query(Usuario).filter(Usuario.telefono == usuario.telefono).first()
-    if existente:
-        raise HTTPException(400, "Teléfono ya registrado")
+    telefono = usuario.telefono.strip()
+    nombre = usuario.nombre.strip()
 
-    hashed = bcrypt.hashpw(usuario.password.encode("utf-8"), bcrypt.gensalt(rounds=10)).decode("utf-8")
+    existente = (
+        db.query(Usuario)
+        .filter(Usuario.telefono == telefono)
+        .first()
+    )
+
+    if existente:
+        raise HTTPException(
+            status_code=400,
+            detail="Teléfono ya registrado"
+        )
+
+    hashed = bcrypt.hashpw(
+        usuario.password.encode("utf-8"),
+        bcrypt.gensalt(rounds=10)
+    ).decode("utf-8")
+
+    # IMPORT DENTRO DE LA FUNCIÓN
+    from routers.viajes import detectar_ciudad
+
+    ciudad = detectar_ciudad(
+        db,
+        usuario.lat,
+        usuario.lng
+    )
 
     nuevo = Usuario(
-        telefono=usuario.telefono,
-        nombre=usuario.nombre,
+        telefono=telefono,
+        nombre=nombre,
         hashed_password=hashed,
         rol="cliente",
         modo_actual="cliente",
-        activo=False
+        activo=False,
+        ciudad=ciudad["nombre"] if ciudad else None,
+        ciudad_id=ciudad["id"] if ciudad else None
     )
 
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
 
-    return {"usuario_id": nuevo.id}
+    return {
+        "usuario_id": nuevo.id
+    }
 
 # ======================
 # LOGIN
