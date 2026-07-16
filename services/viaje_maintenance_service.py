@@ -52,7 +52,8 @@ class ViajeMaintenanceService:
         timeout = ConfiguracionService.obtener_int(
             db,
             "viajes",
-            "oferta_timeout"
+            "oferta_timeout",
+            default=15
         )
     
         viajes = db.query(Viaje).filter(
@@ -96,7 +97,8 @@ class ViajeMaintenanceService:
         timeout = ConfiguracionService.obtener_int(
             db,
             "viajes",
-            "asignado_timeout"
+            "asignado_timeout",
+            default=20
         )
     
         viajes = db.query(Viaje).filter(
@@ -140,7 +142,8 @@ class ViajeMaintenanceService:
         timeout = ConfiguracionService.obtener_int(
             db,
             "viajes",
-            "en_camino_timeout"
+            "en_camino_timeout",
+            default=45
         )
     
         viajes = db.query(Viaje).filter(
@@ -184,7 +187,8 @@ class ViajeMaintenanceService:
         timeout = ConfiguracionService.obtener_int(
             db,
             "viajes",
-            "llegado_timeout"
+            "llegado_timeout",
+            default=30
         )
     
         viajes = db.query(Viaje).filter(
@@ -228,7 +232,8 @@ class ViajeMaintenanceService:
         timeout = ConfiguracionService.obtener_int(
             db,
             "viajes",
-            "en_curso_timeout"
+            "en_curso_timeout",
+            default=480
         )
     
         viajes = db.query(Viaje).filter(
