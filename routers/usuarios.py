@@ -428,8 +428,10 @@ def session_login(
         db.add(nuevo_token)
 
         user.activo = True
-        if ciudad and ciudad.lower() != "lima":
-            user.ciudad = ciudad
+        if ciudad and ciudad.strip():
+            if user.ciudad != ciudad:
+                print(f"[CIUDAD] {user.telefono}: {user.ciudad} -> {ciudad}")
+                user.ciudad = ciudad
 
         print(f"Ciudad antes commit: '{user.ciudad}'")
 
