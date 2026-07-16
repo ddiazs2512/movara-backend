@@ -1,4 +1,9 @@
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+
+from models import Viaje
+from routers.viajes import actualizar_estado_viaje
+from services.configuracion_service import ConfiguracionService
 
 class ViajeMaintenanceService:
 
@@ -13,7 +18,48 @@ class ViajeMaintenanceService:
 
     @staticmethod
     def revisar_ofertas(db: Session):
-        pass
+    
+        timeout = ConfiguracionService.obtener_int(
+            db,
+            "viajes",
+            "oferta_timeout"
+        )
+    
+        viajes = db.query(Viaje).filter(
+            Viaje.estado == "oferta"
+        ).all()
+    
+        cancelados = 0
+    
+        for viaje in viajes:
+    
+            if viaje.fecha_creacion is None:
+                continue
+    
+            tiempo = datetime.utcnow() - viaje.fecha_creacion
+    
+            if tiempo >= timedelta(minutes=timeout):
+    
+                print(
+                    f"[MANTENIMIENTO] "
+                    f"Cancelando viaje {viaje.id} "
+                    f"por timeout ({timeout} min)"
+                )
+    
+                actualizar_estado_viaje(
+                    db,
+                    viaje,
+                    "cancelado"
+                )
+    
+                cancelados += 1
+    
+        if cancelados:
+    
+            print(
+                f"[MANTENIMIENTO] "
+                f"Ofertas canceladas: {cancelados}"
+            )
 
     @staticmethod
     def revisar_asignados(db: Session):
