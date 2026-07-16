@@ -4,7 +4,6 @@ from pydantic import BaseModel
 import bcrypt
 from fastapi.security import OAuth2PasswordBearer
 import random
-from routers.viajes import detectar_ciudad
 from sqlalchemy import or_
 
 from auth import verify_token, create_access_token
@@ -482,6 +481,7 @@ def actualizar_mi_ciudad(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    from routers.viajes import detectar_ciudad
 
     print(f"[GPS CLIENTE] {user.telefono} lat={data.lat} lng={data.lng}")
 
