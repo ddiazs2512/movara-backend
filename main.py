@@ -18,12 +18,19 @@ from routers import places
 from routers import reverse_geocode
 from routers import admin_web
 
+from services.scheduler_service import iniciar_scheduler
+
 # ======================
 # CONFIG INICIAL
 # ======================
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
+
+@app.on_event("startup")
+def startup():
+
+    iniciar_scheduler()
 
 # ======================
 # FIREBASE
