@@ -59,6 +59,10 @@ class UsuarioLogin(BaseModel):
 class TokenRequest(BaseModel):
     token: str
 
+class ActualizarCiudadRequest(BaseModel):
+    lat: float
+    lng: float
+
 # ======================
 # REGISTER
 # ======================
@@ -470,3 +474,44 @@ def logout(
     except Exception as e:
         print("❌ ERROR LOGOUT:", e)
         raise HTTPException(500, "Error cerrando sesión")
+
+@router.post("/actualizar_mi_ciudad")
+def actualizar_mi_ciudad(
+    data: ActualizarCiudadRequest,
+    user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    from routers.viajes import detectar_ciudad
+
+    ciudad = detectar_ciudad(
+        db,
+        data.lat,
+        data.lng
+    )
+
+    if not ciudad:
+        return {
+            "mensaje": "Ciudad no encontrada"
+        }
+
+    if (
+        user.ciudad_id != ciudad["id"]
+        or
+        user.ciudad != ciudad["nombre"]
+    ):
+
+        print(
+            f"[CIUDAD CLIENTE] "
+            f"{user.telefono}: "
+            f"{user.ciudad} -> {ciudad['nombre']}"
+        )
+
+        user.ciudad_id = ciudad["id"]
+        user.ciudad = ciudad["nombre"]
+
+        db.commit()
+
+    return {
+        "mensaje": "Ciudad actualizada"
+    }
