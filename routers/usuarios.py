@@ -51,8 +51,8 @@ class UsuarioCreate(BaseModel):
     telefono: str
     password: str
     nombre: str
-    lat: float
-    lng: float
+    lat: float | None = None
+    lng: float | None = None
 
 class UsuarioLogin(BaseModel):
     telefono: str
@@ -96,13 +96,17 @@ def register(
     ).decode("utf-8")
 
     # IMPORT DENTRO DE LA FUNCIÓN
-    from routers.viajes import detectar_ciudad
+    ciudad = None
 
-    ciudad = detectar_ciudad(
-        db,
-        usuario.lat,
-        usuario.lng
-    )
+    if usuario.lat is not None and usuario.lng is not None:
+    
+        from routers.viajes import detectar_ciudad
+    
+        ciudad = detectar_ciudad(
+            db,
+            usuario.lat,
+            usuario.lng
+        )
 
     nuevo = Usuario(
         telefono=telefono,
