@@ -10,11 +10,15 @@ class ViajeMaintenanceService:
     @staticmethod
     def ejecutar(db: Session):
 
+        print("[MANTENIMIENTO] Inicio de ciclo")
+
         ViajeMaintenanceService.revisar_ofertas(db)
         ViajeMaintenanceService.revisar_asignados(db)
         ViajeMaintenanceService.revisar_en_camino(db)
         ViajeMaintenanceService.revisar_llegados(db)
         ViajeMaintenanceService.revisar_en_curso(db)
+
+        print("[MANTENIMIENTO] Fin de ciclo")
 
     @staticmethod
     def revisar_ofertas(db: Session):
