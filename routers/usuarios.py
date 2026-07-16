@@ -402,8 +402,15 @@ def session_login(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    
+
     try:
+
+        print("\n================ SESSION LOGIN ================")
+        print(f"Usuario ID         : {user.id}")
+        print(f"Nombre             : {user.nombre}")
+        print(f"Teléfono           : {user.telefono}")
+        print(f"Ciudad recibida    : '{ciudad}'")
+        print(f"Ciudad actual BD   : '{user.ciudad}'")
 
         db.query(FCMToken).filter(
             FCMToken.usuario_id == user.id
@@ -417,12 +424,18 @@ def session_login(
             usuario_id=user.id,
             token=token
         )
+
         db.add(nuevo_token)
 
         user.activo = True
         user.ciudad = ciudad
 
+        print(f"Ciudad antes commit: '{user.ciudad}'")
+
         db.commit()
+
+        print(f"Ciudad después commit: '{user.ciudad}'")
+        print("===============================================\n")
 
         return {"mensaje": "Sesión iniciada"}
 
