@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy import text
 
 from database import get_db
 from models import Usuario, Viaje
@@ -58,6 +59,16 @@ async def dashboard(
 
     entregas_activas = 0
 
+    # ===========================
+    # Estado PostgreSQL
+    # ===========================
+    
+    try:
+        db.execute(text("SELECT 1"))
+        postgres_estado = "✅ Operativo"
+    except Exception:
+        postgres_estado = "❌ Sin conexión"
+
     return templates.TemplateResponse(
         request=request,
         name="dashboard/index.html",
@@ -66,6 +77,7 @@ async def dashboard(
             "usuarios": total_usuarios,
             "conductores": conductores_online,
             "viajes": viajes_activos,
-            "entregas": entregas_activas
+            "entregas": entregas_activas,
+            "postgres_estado": postgres_estado
         }
     )
