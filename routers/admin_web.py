@@ -39,8 +39,8 @@ async def dashboard(
     # ===========================
     # Conductores
     # ===========================
-
-    conductores_online = db.query(Usuario).filter(
+    
+    conductores_registrados = db.query(Usuario).filter(
         Usuario.rol == "conductor"
     ).count()
 
