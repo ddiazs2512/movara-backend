@@ -29,12 +29,19 @@ async def dashboard(
     total_usuarios = db.query(func.count(Usuario.id)).scalar() or 0
 
     # ===========================
+    # Clientes
+    # ===========================
+
+    clientes_registrados = db.query(Usuario).filter(
+        Usuario.rol == "cliente"
+    ).count()
+
+    # ===========================
     # Conductores
     # ===========================
 
     conductores_online = db.query(Usuario).filter(
-        Usuario.rol == "conductor",
-        Usuario.activo == True
+        Usuario.rol == "conductor"
     ).count()
 
     # ===========================
@@ -75,7 +82,8 @@ async def dashboard(
         context={
             "page_title": "Dashboard",
             "usuarios": total_usuarios,
-            "conductores": conductores_online,
+            "clientes": clientes_registrados,
+            "conductores": conductores_registrados,
             "viajes": viajes_activos,
             "entregas": entregas_activas,
             "postgres_estado": postgres_estado
