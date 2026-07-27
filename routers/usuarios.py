@@ -446,8 +446,6 @@ def session_login(
         print(f"Usuario ID         : {user.id}")
         print(f"Nombre             : {user.nombre}")
         print(f"Teléfono           : {user.telefono}")
-        print(f"Ciudad recibida    : '{ciudad}'")
-        print(f"Ciudad actual BD   : '{user.ciudad}'")
 
         db.query(FCMToken).filter(
             FCMToken.usuario_id == user.id
@@ -457,24 +455,18 @@ def session_login(
             FCMToken.token == token
         ).delete()
 
-        nuevo_token = FCMToken(
-            usuario_id=user.id,
-            token=token
+        db.add(
+            FCMToken(
+                usuario_id=user.id,
+                token=token
+            )
         )
 
-        db.add(nuevo_token)
-
         user.activo = True
-        if ciudad and ciudad.strip():
-            if user.ciudad != ciudad:
-                print(f"[CIUDAD] {user.telefono}: {user.ciudad} -> {ciudad}")
-                user.ciudad = ciudad
-
-        print(f"Ciudad antes commit: '{user.ciudad}'")
 
         db.commit()
 
-        print(f"Ciudad después commit: '{user.ciudad}'")
+        print("Sesión iniciada correctamente")
         print("===============================================\n")
 
         return {"mensaje": "Sesión iniciada"}
