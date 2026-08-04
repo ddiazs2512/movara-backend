@@ -50,25 +50,35 @@ class HereReverseAdapter:
         if not items:
             return ""
         
-        direccion = (
-            items[0]
-            .get("address", {})
-            .get("label", "")
-        )
+        # TEMPORAL: para ver exactamente qué devuelve HERE
+        print("========== HERE RESPONSE ==========")
+        print(items[0])
+        print("===================================")
         
-        # Quitar el país
-        direccion = direccion.replace(", Perú", "")
+        address = items[0].get("address", {})
         
-        # Quitar el código postal de 5 dígitos
-        import re
+        street = address.get("street", "")
+        house = address.get("houseNumber", "")
+        district = address.get("district", "")
+        city = address.get("city", "")
+        label = address.get("label", "")
         
-        direccion = re.sub(
-            r",\s*\d{5}\s+",
-            ", ",
-            direccion
-        )
+        if street:
         
-        return direccion.strip()
+            direccion = street
+        
+            if house:
+                direccion += f" {house}"
+        
+            return direccion
+        
+        if district:
+            return district
+        
+        if city:
+            return city
+        
+        return label
 
 
 here_reverse_adapter = HereReverseAdapter()
