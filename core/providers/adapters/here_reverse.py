@@ -50,35 +50,38 @@ class HereReverseAdapter:
         if not items:
             return ""
         
-        # TEMPORAL: para ver exactamente qué devuelve HERE
-        print("========== HERE RESPONSE ==========")
-        print(items[0])
-        print("===================================")
-        
         address = items[0].get("address", {})
         
-        street = address.get("street", "")
-        house = address.get("houseNumber", "")
-        district = address.get("district", "")
-        city = address.get("city", "")
+        street = address.get("street")
+        house = address.get("houseNumber")
+        district = address.get("district")
+        subdistrict = address.get("subdistrict")
+        city = address.get("city")
+        county = address.get("county")
         label = address.get("label", "")
         
+        # Calle + número
         if street:
-        
-            direccion = street
-        
             if house:
-                direccion += f" {house}"
+                return f"{street} {house}"
+            return street
         
-            return direccion
-        
+        # Distrito o barrio
         if district:
             return district
         
+        if subdistrict:
+            return subdistrict
+        
+        # Ciudad
         if city:
             return city
         
+        # Provincia
+        if county:
+            return county
+        
+        # Último recurso
         return label
-
 
 here_reverse_adapter = HereReverseAdapter()
