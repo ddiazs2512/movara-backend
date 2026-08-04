@@ -19,6 +19,9 @@ from core.providers.adapters.here_places import (
 from core.providers.adapters.mapbox_reverse import (
     mapbox_reverse_adapter
 )
+from core.providers.adapters.mapbox_reverse import (
+    mapbox_reverse_adapter
+)
 
 
 class ProviderRegistry:
@@ -93,4 +96,9 @@ provider_registry.register(
 provider_registry.register(
     "mapbox_reverse",
     mapbox_reverse_adapter
+)
+
+provider_registry.register(
+    "here_reverse",
+    here_reverse_adapter
 )
