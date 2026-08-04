@@ -197,14 +197,12 @@ def crear_viaje(
     db: Session = Depends(get_db)
 ):
 
-    print(f"Origen texto : {viaje.origen}")
-    print(f"Destino texto: {viaje.destino}")
-    
     print(f"Lat origen : {viaje.lat_origen}")
     print(f"Lng origen : {viaje.lng_origen}")
-    
     print(f"Lat destino: {viaje.lat_destino}")
     print(f"Lng destino: {viaje.lng_destino}")
+    print(f"Origen texto : {viaje.origen}")
+    print(f"Destino texto: {viaje.destino}")
 
     cliente_id = current_user.id
 
