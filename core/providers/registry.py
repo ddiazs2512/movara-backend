@@ -19,8 +19,8 @@ from core.providers.adapters.here_places import (
 from core.providers.adapters.mapbox_reverse import (
     mapbox_reverse_adapter
 )
-from core.providers.adapters.mapbox_reverse import (
-    mapbox_reverse_adapter
+from core.providers.adapters.here_reverse import (
+    here_reverse_adapter
 )
 
 
