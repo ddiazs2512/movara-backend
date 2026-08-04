@@ -1,8 +1,5 @@
 """
 HERE Reverse Geocoding Adapter.
-
-Único responsable de comunicarse con
-HERE Reverse Geocoding API.
 """
 
 from __future__ import annotations
@@ -10,16 +7,15 @@ from __future__ import annotations
 import os
 import requests
 
-
 HERE_API_KEY = os.getenv("HERE_API_KEY")
 
 if not HERE_API_KEY:
-    raise Exception("HERE_API_KEY no configurado")
+    raise Exception("HERE_API_KEY no definida")
 
 
 class HereReverseAdapter:
 
-    BASE_URL = (
+    REVERSE_URL = (
         "https://revgeocode.search.hereapi.com/v1/revgeocode"
     )
 
@@ -29,19 +25,19 @@ class HereReverseAdapter:
         lng: float
     ) -> str:
 
-        url = (
-            f"{self.BASE_URL}"
-            f"?at={lat},{lng}"
-            f"&lang=es-PE"
-            f"&apiKey={HERE_API_KEY}"
-        )
+        params = {
+            "at": f"{lat},{lng}",
+            "lang": "es-PE",
+            "apiKey": HERE_API_KEY
+        }
 
         print("========== HERE REVERSE ==========")
-        print(url)
-        print("=================================")
+        print(params)
+        print("==================================")
 
         response = requests.get(
-            url,
+            self.REVERSE_URL,
+            params=params,
             timeout=10
         )
 
@@ -54,13 +50,7 @@ class HereReverseAdapter:
         if not items:
             return ""
 
-        return items[0].get(
-            "address",
-            {}
-        ).get(
-            "label",
-            ""
-        )
+        return items[0]["address"]["label"]
 
 
 here_reverse_adapter = HereReverseAdapter()
