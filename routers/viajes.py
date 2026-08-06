@@ -751,6 +751,20 @@ def viaje_activo(
             Oferta.estado == "activa"
         ).all()
 
+        print("========== OFERTAS ==========")
+        print(f"Viaje: {viaje.id}")
+        print(f"Cantidad: {len(ofertas)}")
+        
+        for o in ofertas:
+            print(
+                f"id={o.id} "
+                f"conductor={o.conductor_id} "
+                f"precio={o.precio} "
+                f"estado={o.estado}"
+            )
+        
+        print("=============================")
+
     # ======================
     # USUARIOS DE OFERTAS
     # ======================
