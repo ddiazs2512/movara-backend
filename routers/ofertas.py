@@ -141,19 +141,69 @@ async def responder_oferta(
     # RECHAZAR
     # ======================
     elif data.accion == "rechazar":
-
-        if current_user.rol != "conductor":
-            raise HTTPException(403, "Solo conductores")
-
-        db.query(Oferta).filter(
-            Oferta.viaje_id == data.viaje_id,
-            Oferta.conductor_id == current_user.id,
-            Oferta.estado == "activa"
-        ).update({"estado": "rechazada"})
-
-        db.commit()
-
-        return {"mensaje": "Oferta rechazada"}
+    
+        # ----------------------
+        # CONDUCTOR RECHAZA
+        # SU PROPIA OFERTA
+        # ----------------------
+        if current_user.rol == "conductor":
+    
+            db.query(Oferta).filter(
+                Oferta.viaje_id == data.viaje_id,
+                Oferta.conductor_id == current_user.id,
+                Oferta.estado == "activa"
+            ).update({
+                "estado": "rechazada"
+            })
+    
+            db.commit()
+    
+            return {
+                "mensaje": "Oferta rechazada"
+            }
+    
+        # ----------------------
+        # CLIENTE RECHAZA
+        # UNA OFERTA RECIBIDA
+        # ----------------------
+        if current_user.modo_actual == "cliente":
+    
+            if viaje.cliente_id != current_user.id:
+                raise HTTPException(
+                    403,
+                    "No eres el cliente de este viaje"
+                )
+    
+            if not data.conductor_id:
+                raise HTTPException(
+                    400,
+                    "Falta conductor_id"
+                )
+    
+            oferta = db.query(Oferta).filter(
+                Oferta.viaje_id == data.viaje_id,
+                Oferta.conductor_id == data.conductor_id,
+                Oferta.estado == "activa"
+            ).first()
+    
+            if not oferta:
+                raise HTTPException(
+                    404,
+                    "Oferta no encontrada"
+                )
+    
+            oferta.estado = "rechazada"
+    
+            db.commit()
+    
+            return {
+                "mensaje": "Oferta descartada"
+            }
+    
+        raise HTTPException(
+            403,
+            "No autorizado para rechazar ofertas"
+        )
 
     # ======================
     # ACEPTAR
