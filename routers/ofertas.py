@@ -134,7 +134,26 @@ async def responder_oferta(
 
         db.commit()
         db.refresh(oferta)
-
+        
+        # =========================
+        # FCM → CLIENTE
+        # =========================
+        
+        tokens = db.query(FCMToken).join(Usuario).filter(
+            FCMToken.usuario_id == viaje.cliente_id,
+            Usuario.activo == True
+        ).all()
+        
+        for t in tokens:
+        
+            enviar_notificacion_data(
+                token=t.token,
+                data={
+                    "type": "nueva_oferta",
+                    "viaje_id": str(viaje.id)
+                }
+            )
+        
         return {"mensaje": "Oferta enviada"}
 
     # ======================
