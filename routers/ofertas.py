@@ -138,6 +138,10 @@ async def responder_oferta(
         # =========================
         # FCM → CLIENTE
         # =========================
+
+        print(
+            f"[FCM] Nueva oferta → cliente={viaje.cliente_id} viaje={viaje.id}"
+        )
         
         tokens = db.query(FCMToken).join(Usuario).filter(
             FCMToken.usuario_id == viaje.cliente_id,
